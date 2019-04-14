@@ -1,0 +1,15 @@
+#detail{
+    margin: auto;
+    padding-top:50px;
+    padding-left: 100px;
+}
+
+
+#cover{
+    float: left;
+}
+#info{
+    float: left;
+    margin: 15px;
+    right: 15px;
+}
