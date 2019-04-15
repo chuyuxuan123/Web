@@ -37,7 +37,7 @@ export default class AccountManage extends Component {
             var dataSource = new Array();
             for(var i in d){
                 var tmp = d[i];
-                dataSource.push({"key":parseInt(i)+1,"user":tmp.username,"password":tmp.password,"email":tmp.email,"auth":tmp.enable});
+                dataSource.push({"key":tmp.userId,"user":tmp.username,"password":tmp.password,"email":tmp.email,"auth":tmp.enable});
             }
             this.setState({
                 data:dataSource,

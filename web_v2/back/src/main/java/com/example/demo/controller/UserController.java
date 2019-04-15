@@ -23,10 +23,10 @@ public class UserController {
 
     @GetMapping("/auth")
     @ResponseBody
-    public String updateEnableByUsername(@RequestParam("user") String username,@RequestParam("enable") String enable){
-        if(enable.equals("false")) {
+    public String updateEnableByUsername(@RequestParam("user") String username, @RequestParam("enable") String enable) {
+        if (enable.equals("false")) {
             userRepository.updateEnableByUsername(username, false);
-        }else {
+        } else {
             userRepository.updateEnableByUsername(username, true);
         }
         return "updated";

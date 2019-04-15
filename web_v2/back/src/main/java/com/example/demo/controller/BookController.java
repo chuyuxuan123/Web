@@ -24,7 +24,7 @@ public class BookController {
     @GetMapping(path = "/get")
     public @ResponseBody
     Book getBookByISBN(@RequestParam String ISBN) {
-            return bookRepository.findByIsbn(ISBN);
+        return bookRepository.findByIsbn(ISBN);
     }
 
 //    @GetMapping(path = "/add")

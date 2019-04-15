@@ -97,7 +97,7 @@ export default class Booklist extends Component {
                 var n = new Array();
                 for (var i in d) {
                     var t = d[i];
-                    n.push({"key":parseInt(i) + 1,"bookname":t.bookname,"author":t.author,"ISBN":t.isbn,"inventory":t.inventory,"cover":t.cover});
+                    n.push({"key":t.bookId,"bookname":t.bookname,"author":t.author,"ISBN":t.isbn,"inventory":t.inventory,"cover":t.cover});
                 }
                 // console.log(n);
                 // console.log(d);
