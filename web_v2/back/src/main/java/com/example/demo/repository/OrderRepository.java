@@ -1,4 +1,7 @@
 package com.example.demo.repository;
 
-public class OrderRepository {
+import com.example.demo.model.Order;
+import org.springframework.data.repository.CrudRepository;
+
+public interface OrderRepository extends CrudRepository<Order,Long> {
 }

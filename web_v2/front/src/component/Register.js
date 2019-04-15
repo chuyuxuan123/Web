@@ -7,7 +7,6 @@ import '../assets/css/register.css';
 class Register extends Component {
     state = {
         confirmDirty: false,
-        autoCompleteResult: [],
     };
 
     handleSubmit = (e) => {

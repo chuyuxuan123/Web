@@ -4,13 +4,49 @@ import {
     Table, Button, Icon, Switch,Input
 } from 'antd';
 import Highlighter from 'react-highlight-words';
+import Axios from 'axios';
 
 export default class AccountManage extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            data:[],
             searchText: '',
+            loading:false,
         }
+    }
+
+    componentDidMount(){
+        this.fetch();
+    }
+
+    // 返回的数据形式如下
+    // {
+    //     key:,
+    //     user:,
+    //     password:,
+    //     email:,
+    //     auth:,
+    // }
+    fetch=()=>{
+        this.setState({loading:true});
+        Axios.get('http://localhost:8080/users/all')
+        .then((response)=>{
+            // console.log(response.data);
+            var d = response.data;
+            var dataSource = new Array();
+            for(var i in d){
+                var tmp = d[i];
+                dataSource.push({"key":parseInt(i)+1,"user":tmp.username,"password":tmp.password,"email":tmp.email,"auth":tmp.enable});
+            }
+            this.setState({
+                data:dataSource,
+                loading:false,
+            })
+        })
+        .catch(function(error){
+            console.log(error);
+        });
     }
 
     getColumnSearchProps = (dataIndex) => ({
@@ -71,6 +107,25 @@ export default class AccountManage extends Component {
         this.setState({ searchText: '' });
     }
 
+    handleAuth = (item) => {        
+        console.log(item)
+        var datasource = [...this.state.data];
+        for(let i = 0;i<datasource.length;++i){
+            if(datasource[i].key==item.key){
+                datasource[i].auth = !datasource[i].auth;
+            }
+        }
+        Axios.get("http://localhost:8080/users/auth",{params:{
+            user:item.user,
+            enable:item.auth
+        }
+    }).then(function(response){
+        console.log(response);
+    }).catch(function(error){
+        console.log(error);
+    })
+        this.setState({data:datasource});
+    }
 
     render() {
         const columns = [{
@@ -90,28 +145,12 @@ export default class AccountManage extends Component {
         }, {
             title: 'Authority',
             key: 'auth',
-            render: () => (<Switch defaultChecked />)
+            render: (key,item) => (<Switch checked={item.auth} onChange={()=>this.handleAuth(item)} />)
         }];
 
-        const data = [{
-            key: 1,
-            user: 'admin',
-            password: '1234',
-            email: 'admin@qq.com'
-        }, {
-            key: 2,
-            user: 'Alice',
-            password: '2345',
-            email: 'alice@gmail.com'
-        }, {
-            key: 3,
-            user: 'Bob',
-            password: '3456',
-            email: 'bob@126.com'
-        }]
         return (
             <div>
-                <Table columns={columns} dataSource={data} />
+                <Table columns={columns} dataSource={this.state.data} loading={this.state.loading} />
             </div>
         )
     }

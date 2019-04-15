@@ -89,7 +89,7 @@ export default class Booklist extends Component {
     fetch = (params = {}) => {
 
         this.setState({ loading: true });
-        Axios.get('http://localhost:8080/book/all')
+        Axios.get('http://localhost:8080/books/all')
             .then((response) => {
                 // console.log(response);
 
@@ -215,7 +215,7 @@ export default class Booklist extends Component {
             key: 'cover',
             render: (imgurl) => (
                 <span>
-                    <img src={process.env.PUBLIC_URL + imgurl} alt="暂无封面" className="cover" style={{ maxWidth: "60px" }} />
+                    <img src={"http://localhost:8080/image" + imgurl} alt="暂无封面" className="cover" style={{ maxWidth: "60px" }} />
                 </span>
             ),
             width: '10%',

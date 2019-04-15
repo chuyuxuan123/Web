@@ -26,7 +26,7 @@ export default class BookDetail extends Component {
   }
 
   fetch = (isbn)=>{
-    Axios.get('http://localhost:8080/book/get',{
+    Axios.get('http://localhost:8080/books/get',{
       params:{
         ISBN:this.props.match.params.isbn
       },
