@@ -1,11 +1,9 @@
 package com.example.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Data
 @Entity
@@ -15,13 +13,20 @@ public class OrderItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long orderItemId;
 
-    private Long orderId;
+    @ManyToOne
+    @JoinColumn(name = "orderId")
+    private UserOrder userOrder;
 
-    private Long bookId;
+    @OneToOne
+    @JoinColumn(name = "bookId")
+    private Book book;
 
     private int amount;
 
     private int price;
 
-
+    @JsonBackReference
+    public void setUserOrder(UserOrder userOrder) {
+        this.userOrder = userOrder;
+    }
 }

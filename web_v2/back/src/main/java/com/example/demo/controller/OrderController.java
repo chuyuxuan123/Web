@@ -1,7 +1,8 @@
 package com.example.demo.controller;
 
 
-import com.example.demo.model.Order;
+import com.example.demo.model.OrderItem;
+import com.example.demo.model.UserOrder;
 import com.example.demo.repository.OrderItemRepository;
 import com.example.demo.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,10 +11,6 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 @Controller
 @CrossOrigin("http://localhost:3000")
@@ -26,7 +23,17 @@ public class OrderController {
     @Autowired
     private OrderItemRepository orderItemRepository;
 
+    @GetMapping("/all")
+    public @ResponseBody
+    Iterable<UserOrder> getAllOrders(){
+        return orderRepository.findAll();
+    }
 
+    @GetMapping("/allItems")
+    public @ResponseBody
+    Iterable<OrderItem> getAllOrderItems(){
+        return orderItemRepository.findAll();
+    }
 
 
 }

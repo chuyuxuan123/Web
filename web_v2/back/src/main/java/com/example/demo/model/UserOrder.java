@@ -6,11 +6,12 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.sql.Date;
+import java.util.List;
 
 @Data
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-public class Order {
+public class UserOrder {
 
     @Id
     @GeneratedValue
@@ -20,6 +21,10 @@ public class Order {
     @Column(name = "order_time")
     private Date createTime;
 
+    @ManyToOne
+    @JoinColumn(name = "userId")
+    private User user;
 
-    private Long userId;
+    @OneToMany(mappedBy = "userOrder")
+    private List<OrderItem> orderItems;
 }
