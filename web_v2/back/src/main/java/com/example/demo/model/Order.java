@@ -21,5 +21,5 @@ public class Order {
     private Date createTime;
 
 
-    private String username;
+    private Long userId;
 }
