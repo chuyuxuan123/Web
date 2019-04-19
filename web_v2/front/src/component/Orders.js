@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import {  Table } from 'antd';
 
 import StatisticForm from './StatisticForm';
+import Axios from 'axios';
 
 
 
@@ -26,7 +27,31 @@ export default class Orders extends Component {
     super(props);
     this.state = {
       searchText: '',
+      dataSource:[],
     };
+  }
+
+  componentDidMount(){
+    this.fetch();
+  }
+
+  fetch = () => {
+    Axios.get("http://localhost:8080/orders/all").then((response)=>{
+      console.log(response.data);
+      var gotdata = response.data;
+      var ret  = new Array();
+      for (let index = 0; index < gotdata.length; index++) {
+        const element = gotdata[index];
+        for (let item_i = 0; item_i < element.orderItems.length; item_i++) {
+          const item = element.orderItems[item_i];
+          ret.push(makeData(element.orderId,element.createTime,element.user.username,item.book.bookname,item.amount,item.book.isbn));
+        }
+      }
+      console.log(ret);
+      this.setState({dataSource:ret});
+    }).catch(function(error){
+      console.log(error);
+    });
   }
 
   render() {
@@ -85,8 +110,8 @@ export default class Orders extends Component {
       <div>
         <StatisticForm isAdmin={this.props.isAdmin} />
         {this.props.isAdmin ?
-          <Table columns={columnsAdmin} dataSource={data} /> :
-          <Table columns={columnsUser} dataSource={data} />}
+          <Table columns={columnsAdmin} dataSource={this.state.dataSource} /> :
+          <Table columns={columnsUser} dataSource={this.state.dataSource} />}
       </div>
     )
   }

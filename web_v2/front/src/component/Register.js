@@ -3,6 +3,7 @@ import {
     Form, Input, Tooltip, Icon, Checkbox, Button
 } from 'antd';
 import '../assets/css/register.css';
+import Axios from 'axios';
 
 class Register extends Component {
     state = {
@@ -14,6 +15,18 @@ class Register extends Component {
         this.props.form.validateFieldsAndScroll((err, values) => {
             if (!err) {
                 console.log('Received values of form: ', values);
+                Axios.get("http://localhost:8080/users/registration",{
+                    params:{
+                        username:values.username,
+                        email:values.email,
+                        password:values.password,
+                    }
+                }).then((response)=>{
+                    console.log("注册成功");
+                    window.location.href = "http://localhost:3000/";
+                }).catch((error)=>{
+                    console.log(error);
+                })
             }
         });
     }

@@ -7,26 +7,45 @@ import {
 } from 'antd';
 
 import '../assets/css/signin.css';
+import Axios from 'axios';
 
 class Signin extends Component {
     //temporal signin handler
-    //TODOS: back end
+    //TODO: handle signin
     handleSubmit = (e) => {
         e.preventDefault();
         console.log(e);
         this.props.form.validateFields((err, values) => {
             if (!err) {
                 console.log('Received values of form: ', values);
+                Axios.get("http://localhost:8080/users/sign",{
+                    params:{
+                        username:values.userName,
+                        password:values.password,
+                    }
+                }).then((response)=>{
+                    console.log(response);
+                    if(response.data==="ADMIN"){
+                        this.props.handleLogin(0);
+                        this.props.setUsername(userName);
+                        alert("登录成功");
+                    }else if(response.data==="USER"){
+                        this.props.handleLogin(1);
+                        this.props.setUsername(userName);
+                        alert("登录成功");
+                    }
+                    else if(response.data==="BAN"){
+                        this.props.handleLogin(-1);
+                    }
+                    else if(response.data==="WRONG"){
+                        alert("用户名或密码错误");
+                    }
+                    else{
+                        alert("登录出错");
+                    }
+                }).catch();
             }
         });
-        var value = this.props.form.getFieldsValue();
-        if (value.userName == "admin") {
-            this.props.handleLogin(0);
-        } else if (value.userName == "banned") {
-            this.props.handleLogin(-1);
-        } else {
-            this.props.handleLogin(1);
-        }
         
     }
 

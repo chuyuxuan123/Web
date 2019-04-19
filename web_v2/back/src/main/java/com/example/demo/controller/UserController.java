@@ -8,7 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-@CrossOrigin("http://localhost:3000")
+@CrossOrigin
 @RequestMapping("/users")
 public class UserController {
 
@@ -30,5 +30,37 @@ public class UserController {
             userRepository.updateEnableByUsername(username, true);
         }
         return "updated";
+    }
+
+    @GetMapping("/registration")
+    @ResponseBody
+    public String addNewUser(@RequestParam("username")String username,@RequestParam("email")String email,@RequestParam("password")String password){
+        User user = new User();
+        user.setAdmin(false);
+        user.setUsername(username);
+        user.setEmail(email);
+        user.setPassword(password);
+        user.setEnable(true);
+        userRepository.save(user);
+        return "saved";
+    }
+
+    @GetMapping("/sign")
+    @ResponseBody
+    public String validateUser(@RequestParam("username")String username,@RequestParam("password")String password){
+        User user = userRepository.getByUsername(username);
+        if(user.getPassword().equals(password)){
+            if(user.isAdmin()){
+                return "ADMIN";
+            }
+            else if(!user.isEnable()){
+                return "BAN";
+            }
+            else {
+                return "USER";
+            }
+        }else {
+            return "WRONG";
+        }
     }
 }

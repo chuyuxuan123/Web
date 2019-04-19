@@ -5,12 +5,14 @@ import com.example.demo.model.OrderItem;
 import com.example.demo.model.UserOrder;
 import com.example.demo.repository.OrderItemRepository;
 import com.example.demo.repository.OrderRepository;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 @CrossOrigin("http://localhost:3000")
@@ -35,5 +37,15 @@ public class OrderController {
         return orderItemRepository.findAll();
     }
 
+    @GetMapping("/{username}/all")
+    public @ResponseBody
+    List<UserOrder> getUserAllOrders(@PathVariable("username")String username){
+        return orderRepository.findByUser_Username(username);
+    }
+
+//    @GetMapping("/{username}/jsonall")
+//    public @ResponseBody
+//    List<JSONObject> getJson(@PathVariable("username") String username){
+//    }
 
 }

@@ -13,4 +13,6 @@ public interface UserRepository extends CrudRepository<User, Long> {
     @Modifying
     @Query(value = "update user set enable = :enable where username = :username ", nativeQuery = true)
     void updateEnableByUsername(@Param("username") String username, @Param("enable") boolean enable);
+
+    User getByUsername(String username);
 }

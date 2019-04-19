@@ -23,8 +23,9 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      login: true,
-      isAdmin: true,
+      username:'',
+      login: false,
+      isAdmin: false,
     };
   }
 
@@ -42,7 +43,9 @@ class App extends Component {
         alert("you have been banned!");
       };
   }
-
+  setUsername=(username)=>{
+      this.setState({username:username});
+  }
 
 handleLogout = () => {
   this.setState({
@@ -65,7 +68,7 @@ render() {
               <div>
                 <Switch>
                   <Route exact path="/" render={props => <Redirect to="/login" />} />
-                  <Route exact path="/login" render={props => <Signin handleLogin={this.handleLogin} />} />
+                  <Route exact path="/login" render={props => <Signin handleLogin={this.handleLogin} setUsername={this.setUsername} />} />
                   <Route exact path="/register" render={props => <Register />} />
                   <Route render={props => <Redirect to="/login" />} />
                 </Switch>

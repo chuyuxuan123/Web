@@ -38,6 +38,14 @@ export default class Cart extends Component {
     }
   }
 
+  componentDidMount(){
+    this.fetch();
+  }
+
+  fetch = ()=>{
+    
+  }
+
   handleAmount = (value, item) => {
     let oldData = [...this.state.dataSource];
     let selectedRows = this.state.selectedRows;

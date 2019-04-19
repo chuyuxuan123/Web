@@ -26,7 +26,7 @@ export default class Navbar extends Component {
     }
 
     handleMenuSelect = (e) => {
-        console.log(e);
+        // console.log(e);
     }
 
     render() {
