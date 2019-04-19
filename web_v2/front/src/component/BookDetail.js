@@ -14,9 +14,8 @@ export default class BookDetail extends Component {
       author:'',
       price:'',
       inventory:'',
-      cover:''
-
-
+      cover:'',
+      amount:1,
     }
   }
 
@@ -50,13 +49,29 @@ export default class BookDetail extends Component {
 
   }
 
+  handlePurchase=()=>{
+    var data = {"username":this.props.username,
+                "amount":this.state.amount,
+                "price":this.state.price,
+                "bookname":this.state.bookname};
+    
+    Axios.post("http://localhost:8080/orders/"+this.props.username+"/buy",data,{      
+      headers: {"Content-Type": "application/json"}
+    })
+  }
+
+  handleAmount = (e) =>{
+    console.log(e);
+    this.setState({amount:e});
+  }
+
   render() {
     return (
       <div id="detail">
         <Card
           hoverable
           style={{ width: 240 }}
-          cover={<img src={process.env.PUBLIC_URL+this.state.cover} alt="暂无封面" />}
+          cover={<img src={"http://localhost:8080/image"+this.state.cover} alt="暂无封面" />}
           id="cover"
         >
           <Meta
@@ -71,9 +86,9 @@ export default class BookDetail extends Component {
           <Statistic title="单价 (CNY)" value={this.state.price} precision={2} suffix="￥" style={{margin:"12px"}} />
           <Statistic title="库存" value={this.state.inventory} style={{margin:"12px"}} />
           <label>选择数量:&nbsp;</label>
-          <InputNumber min={1} max={parseInt(this.state.inventory)} defaultValue={1} size="large" />
+          <InputNumber min={1} max={parseInt(this.state.inventory)} value={this.state.amount} size="large" onChange={this.handleAmount} />
           <br/>
-          <Button type="primary" size="large" style={{margin:"10px"}} >立即购买</Button>
+          <Button type="primary" size="large" style={{margin:"10px"}} onClick={this.handlePurchase} >立即购买</Button>
           <Button type="default" size="large" style={{margin:"10px"}} >添加到购物车</Button>
         </div>
       </div>

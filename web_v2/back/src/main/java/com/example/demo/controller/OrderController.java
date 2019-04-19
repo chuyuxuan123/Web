@@ -1,17 +1,19 @@
 package com.example.demo.controller;
 
 
+import com.example.demo.model.Book;
 import com.example.demo.model.OrderItem;
 import com.example.demo.model.UserOrder;
+import com.example.demo.repository.BookRepository;
 import com.example.demo.repository.OrderItemRepository;
 import com.example.demo.repository.OrderRepository;
+import com.example.demo.repository.UserRepository;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -25,21 +27,27 @@ public class OrderController {
     @Autowired
     private OrderItemRepository orderItemRepository;
 
+    @Autowired
+    private BookRepository bookRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
     @GetMapping("/all")
     public @ResponseBody
-    Iterable<UserOrder> getAllOrders(){
+    Iterable<UserOrder> getAllOrders() {
         return orderRepository.findAll();
     }
 
     @GetMapping("/allItems")
     public @ResponseBody
-    Iterable<OrderItem> getAllOrderItems(){
+    Iterable<OrderItem> getAllOrderItems() {
         return orderItemRepository.findAll();
     }
 
     @GetMapping("/{username}/all")
     public @ResponseBody
-    List<UserOrder> getUserAllOrders(@PathVariable("username")String username){
+    List<UserOrder> getUserAllOrders(@PathVariable("username") String username) {
         return orderRepository.findByUser_Username(username);
     }
 
@@ -47,5 +55,28 @@ public class OrderController {
 //    public @ResponseBody
 //    List<JSONObject> getJson(@PathVariable("username") String username){
 //    }
+
+    @PostMapping(value = "/{username}/buy")
+    public @ResponseBody
+    Integer addOrder(@RequestBody String data, @PathVariable("username") String username) {
+        System.out.println(data);
+        JSONObject jsonObject = new JSONObject(data);
+        Book book = bookRepository.findByBookname(jsonObject.get("bookname").toString());
+
+        UserOrder userOrder = new UserOrder();
+        userOrder.setUser(userRepository.getByUsername(username));
+
+        OrderItem orderItem = new OrderItem();
+        orderItem.setUserOrder(userOrder);
+        orderItem.setBook(book);
+        orderItem.setAmount(jsonObject.getInt("amount"));
+        orderItem.setPrice(jsonObject.getInt("price"));
+
+        Date date = new Date();
+        userOrder.setCreateTime(date);
+        orderRepository.save(userOrder);
+        orderItemRepository.save(orderItem);
+        return 404;
+    }
 
 }

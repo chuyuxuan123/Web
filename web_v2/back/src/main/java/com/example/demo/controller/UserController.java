@@ -34,7 +34,7 @@ public class UserController {
 
     @GetMapping("/registration")
     @ResponseBody
-    public String addNewUser(@RequestParam("username")String username,@RequestParam("email")String email,@RequestParam("password")String password){
+    public String addNewUser(@RequestParam("username") String username, @RequestParam("email") String email, @RequestParam("password") String password) {
         User user = new User();
         user.setAdmin(false);
         user.setUsername(username);
@@ -47,19 +47,17 @@ public class UserController {
 
     @GetMapping("/sign")
     @ResponseBody
-    public String validateUser(@RequestParam("username")String username,@RequestParam("password")String password){
+    public String validateUser(@RequestParam("username") String username, @RequestParam("password") String password) {
         User user = userRepository.getByUsername(username);
-        if(user.getPassword().equals(password)){
-            if(user.isAdmin()){
+        if (user.getPassword().equals(password)) {
+            if (user.isAdmin()) {
                 return "ADMIN";
-            }
-            else if(!user.isEnable()){
+            } else if (!user.isEnable()) {
                 return "BAN";
-            }
-            else {
+            } else {
                 return "USER";
             }
-        }else {
+        } else {
             return "WRONG";
         }
     }

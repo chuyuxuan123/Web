@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { Router, Route, Link } from 'react-router-dom';
 
 import {
-    Form, Icon, Input, Button, Checkbox,
+    Form, Icon, Input, Button, Checkbox, message
 } from 'antd';
 
 import '../assets/css/signin.css';
@@ -27,21 +27,22 @@ class Signin extends Component {
                     console.log(response);
                     if(response.data==="ADMIN"){
                         this.props.handleLogin(0);
-                        this.props.setUsername(userName);
-                        alert("登录成功");
+                        this.props.setUsername(values.userName);
+                        message.info("登录成功");
                     }else if(response.data==="USER"){
                         this.props.handleLogin(1);
-                        this.props.setUsername(userName);
-                        alert("登录成功");
+                        this.props.setUsername(values.userName);
+                        message.info("登录成功");
                     }
                     else if(response.data==="BAN"){
                         this.props.handleLogin(-1);
+                        message.warning("你已被管理员封禁");
                     }
                     else if(response.data==="WRONG"){
-                        alert("用户名或密码错误");
+                        message.error("用户名或密码错误");
                     }
                     else{
-                        alert("登录出错");
+                        message.error("登录出错");
                     }
                 }).catch();
             }

@@ -40,7 +40,7 @@ class App extends Component {
         login: true,
         isAdmin: true,
       })} else if (flag == -1) {
-        alert("you have been banned!");
+        
       };
   }
   setUsername=(username)=>{
@@ -49,8 +49,9 @@ class App extends Component {
 
 handleLogout = () => {
   this.setState({
+    username:'',
     login: false,
-    isAdmin: false
+    isAdmin: false,
   })
 }
 
@@ -81,7 +82,7 @@ render() {
                   <Route exact path="/booklist" render={props => <Booklist isAdmin={this.state.isAdmin} />} />
                   <Route exact path="/cart" render={props => <Cart />} />
                   <Route exact path="/orders" render={props => <Orders isAdmin={this.state.isAdmin} />} />
-                  <Route path="/detail/:isbn" render={props => <BookDetail {...props} />} />
+                  <Route path="/detail/:isbn" render={props => <BookDetail {...props} username={this.state.username} />} />
                   <Route exact path="/settings" />
                   <Route render={props => <Redirect to="/booklist" />} />
                 </Switch>

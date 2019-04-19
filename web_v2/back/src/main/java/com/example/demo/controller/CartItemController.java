@@ -19,10 +19,10 @@ public class CartItemController {
 
     @GetMapping("/{username}/all")
     public @ResponseBody
-    List<CartItem> getByUser_Username(@PathVariable("username") String user){
-        for (CartItem c: cartItemRepository.findByUser_Username(user)
-             ) {
-            JSONObject jsonObject = new JSONObject("{'orderId':"+ c.getCartItemId()+","+ "}");
+    List<CartItem> getByUser_Username(@PathVariable("username") String user) {
+        for (CartItem c : cartItemRepository.findByUser_Username(user)
+        ) {
+            JSONObject jsonObject = new JSONObject("{'orderId':" + c.getCartItemId() + "," + "}");
 
         }
         return cartItemRepository.findByUser_Username(user);

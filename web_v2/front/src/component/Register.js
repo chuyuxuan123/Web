@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {
-    Form, Input, Tooltip, Icon, Checkbox, Button
+    Form, Input, Tooltip, Icon, Checkbox, Button, message
 } from 'antd';
 import '../assets/css/register.css';
 import Axios from 'axios';
@@ -22,10 +22,11 @@ class Register extends Component {
                         password:values.password,
                     }
                 }).then((response)=>{
-                    console.log("注册成功");
+                    message.info("注册成功");
                     window.location.href = "http://localhost:3000/";
                 }).catch((error)=>{
                     console.log(error);
+                    message.error("发生错误，请重试");
                 })
             }
         });
