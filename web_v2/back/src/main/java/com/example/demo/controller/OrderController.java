@@ -3,6 +3,7 @@ package com.example.demo.controller;
 
 import com.example.demo.model.Book;
 import com.example.demo.model.OrderItem;
+import com.example.demo.model.User;
 import com.example.demo.model.UserOrder;
 import com.example.demo.repository.BookRepository;
 import com.example.demo.repository.OrderItemRepository;
@@ -13,6 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.util.Date;
 import java.util.List;
 
@@ -47,8 +51,18 @@ public class OrderController {
 
     @GetMapping("/{username}/all")
     public @ResponseBody
-    List<UserOrder> getUserAllOrders(@PathVariable("username") String username) {
-        return orderRepository.findByUser_Username(username);
+    List<UserOrder> getUserAllOrders(@PathVariable("username") String username,
+                                     HttpServletRequest request,
+                                     HttpServletResponse response,
+                                     HttpSession session) {
+//        response.setHeader("Access-Control-Allow-Credentials", "true");
+//        response.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+//        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+
+
+        User user = (User) session.getAttribute("user");
+        //TODO:返回前端过多数据，应当在后端筛选出需要的数据
+        return orderRepository.findByUser_Username(user.getUsername());
     }
 
 //    @GetMapping("/{username}/jsonall")
@@ -76,7 +90,7 @@ public class OrderController {
         userOrder.setCreateTime(date);
         orderRepository.save(userOrder);
         orderItemRepository.save(orderItem);
-        book.setInventory(book.getInventory()-jsonObject.getInt("amount"));
+        book.setInventory(book.getInventory() - jsonObject.getInt("amount"));
         bookRepository.save(book);
         return 200;
     }

@@ -3,28 +3,30 @@ import React, { Component } from 'react';
 import { Table, InputNumber, Statistic, Button } from 'antd';
 
 import '../assets/css/cart.css';
+import Axios from 'axios';
 
-const data = [{
-  key: '1',
-  bookname: '深入理解计算机系统',
-  price: 60,
-  amount: 1,
-}, {
-  key: '2',
-  bookname: '算法导论',
-  price: 40,
-  amount: 2,
-}, {
-  key: '3',
-  bookname: 'Web开发技术',
-  price: 50,
-  amount: 1,
-}, {
-  key: '4',
-  bookname: 'Mysql从删库到跑路',
-  price: 99,
-  amount: 1,
-}];
+// fixed data
+// const data = [{
+//   key: '1',
+//   bookname: '深入理解计算机系统',
+//   price: 60,
+//   amount: 1,
+// }, {
+//   key: '2',
+//   bookname: '算法导论',
+//   price: 40,
+//   amount: 2,
+// }, {
+//   key: '3',
+//   bookname: 'Web开发技术',
+//   price: 50,
+//   amount: 1,
+// }, {
+//   key: '4',
+//   bookname: 'Mysql从删库到跑路',
+//   price: 99,
+//   amount: 1,
+// }];
 
 export default class Cart extends Component {
 
@@ -32,7 +34,7 @@ export default class Cart extends Component {
     super(props);
     this.state = {
       totalPrice: 0,
-      dataSource: data,
+      dataSource: [],
       selectedRowKeys: [],
       selectedRows: [],
     }
@@ -43,7 +45,20 @@ export default class Cart extends Component {
   }
 
   fetch = ()=>{
-    
+    Axios.get("http://localhost:8080/cartItems/all")
+    .then((response)=>{
+      // console.log(response);
+      var d = response.data;
+      var n = new Array;
+      for (let index = 0; index < d.length; index++) {
+        const element = d[index];
+        n.push({"key":index,"bookname":element.bookname,"price":element.price,"amount":element.amount})
+      }
+      this.setState({dataSource:n});
+    })
+    .catch((error)=>{
+      console.log(error);
+    })
   }
 
   handleAmount = (value, item) => {

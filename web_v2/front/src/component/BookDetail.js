@@ -65,6 +65,22 @@ export default class BookDetail extends Component {
     })
   }
 
+  handleAddToCart=()=>{
+    var data = {"username":this.props.username,
+                "amount":this.state.amount,
+                "price":this.state.price,
+                "bookname":this.state.bookname};
+    
+    Axios.post("http://localhost:8080/cartItems/add/", data, {      
+      headers: {"Content-Type": "application/json"}
+    }).then((response)=>{
+      if(response.data==200){
+        message.info("添加成功");
+        window.history.go(-1);
+      }
+    })
+  }
+
   handleAmount = (e) =>{
     console.log(e);
     this.setState({amount:e});
@@ -94,7 +110,7 @@ export default class BookDetail extends Component {
           <InputNumber min={1} max={parseInt(this.state.inventory)} value={this.state.amount} size="large" onChange={this.handleAmount} />
           <br/>
           <Button type="primary" size="large" style={{margin:"10px"}} onClick={this.handlePurchase} >立即购买</Button>
-          <Button type="default" size="large" style={{margin:"10px"}} >添加到购物车</Button>
+          <Button type="default" size="large" style={{margin:"10px"}} onClick={this.handleAddToCart} >添加到购物车</Button>
         </div>
       </div>
     )

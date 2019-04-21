@@ -63,15 +63,13 @@ public class UserController {
 //        }
 
         User user = userRepository.getByUsername(username);
+//        User user = new User(userRepository.getByUsername(username));
         if (user.getPassword().equals(password)) {
             if (user.isAdmin()) {
 
                 Object sessionUser = session.getAttribute("user");
                 if (sessionUser == null) {
-                    System.out.println("不存在session，设置user=" + username);
                     session.setAttribute("user", user);
-                } else {
-                    System.out.println("存在session，user=" + sessionUser.toString());
                 }
 
                 return "ADMIN";
@@ -81,10 +79,7 @@ public class UserController {
 
                 Object sessionUser = session.getAttribute("user");
                 if (sessionUser == null) {
-                    System.out.println("不存在session，设置user=" + username);
                     session.setAttribute("user", user);
-                } else {
-                    System.out.println("存在session，user=" + sessionUser.toString());
                 }
 
                 return "USER";
@@ -96,7 +91,7 @@ public class UserController {
 
     @RequestMapping("/logout")
     @ResponseBody
-    public Integer logout(HttpSession session){
+    public Integer logout(HttpSession session) {
         session.removeAttribute("user");
         return 200;
     }

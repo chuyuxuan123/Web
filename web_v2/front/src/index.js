@@ -3,7 +3,9 @@ import ReactDOM from 'react-dom';
 import App from './component/App';
 import TestComponent from './TestComponent';
 import * as serviceWorker from './serviceWorker';
+import Axios from 'axios';
 
+Axios.defaults.withCredentials = true;
 ReactDOM.render(<App />, document.getElementById('root'));
 // ReactDOM.render(<TestComponent />, document.getElementById('root'));
 
