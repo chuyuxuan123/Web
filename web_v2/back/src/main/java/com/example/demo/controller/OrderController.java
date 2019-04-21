@@ -76,7 +76,9 @@ public class OrderController {
         userOrder.setCreateTime(date);
         orderRepository.save(userOrder);
         orderItemRepository.save(orderItem);
-        return 404;
+        book.setInventory(book.getInventory()-jsonObject.getInt("amount"));
+        bookRepository.save(book);
+        return 200;
     }
 
 }

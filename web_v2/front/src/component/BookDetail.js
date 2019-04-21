@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Card, Statistic, InputNumber, Button } from 'antd';
+import { Card, Statistic, InputNumber, Button, message } from 'antd';
 
 import '../assets/css/bookdetail.css';
 import Axios from 'axios';
@@ -57,6 +57,11 @@ export default class BookDetail extends Component {
     
     Axios.post("http://localhost:8080/orders/"+this.props.username+"/buy",data,{      
       headers: {"Content-Type": "application/json"}
+    }).then((response)=>{
+      if(response.data==200){
+        message.info("购买成功");
+        window.history.go(-1);
+      }
     })
   }
 

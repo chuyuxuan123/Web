@@ -2,13 +2,11 @@ package com.example.demo.model;
 
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 @Data
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"isbn", "bookname"}))
 public class Book {
 
     @Id
@@ -26,4 +24,6 @@ public class Book {
     private String cover;
 
     private Integer price;
+
+    private boolean deleted;
 }

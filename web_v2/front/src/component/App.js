@@ -13,6 +13,7 @@ import AccountManage from './AccountManage';
 import BookDetail from './BookDetail';
 import Cart from './Cart';
 import Orders from './Orders';
+import Axios from 'axios';
 
 const {
   Header, Content, Footer
@@ -47,12 +48,19 @@ class App extends Component {
       this.setState({username:username});
   }
 
-handleLogout = () => {
-  this.setState({
-    username:'',
-    login: false,
-    isAdmin: false,
-  })
+  handleLogout = () => {
+    Axios.get("http://localhost:8080/users/logout")
+    .then((response)=>{
+      
+        this.setState({
+          username:'',
+          login: false,
+          isAdmin: false,
+        });
+        
+
+    }).catch((error)=>{});
+  
 }
 
 
@@ -69,6 +77,7 @@ render() {
               <div>
                 <Switch>
                   <Route exact path="/" render={props => <Redirect to="/login" />} />
+                  <Route exact path="/booklist" render={props => <Booklist isAdmin={this.state.isAdmin} />} />
                   <Route exact path="/login" render={props => <Signin handleLogin={this.handleLogin} setUsername={this.setUsername} />} />
                   <Route exact path="/register" render={props => <Register />} />
                   <Route render={props => <Redirect to="/login" />} />

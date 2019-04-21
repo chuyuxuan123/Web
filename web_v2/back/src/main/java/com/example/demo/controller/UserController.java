@@ -7,6 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
 @Controller
 @CrossOrigin
 @RequestMapping("/users")
@@ -47,18 +50,54 @@ public class UserController {
 
     @GetMapping("/sign")
     @ResponseBody
-    public String validateUser(@RequestParam("username") String username, @RequestParam("password") String password) {
+    public String validateUser(@RequestParam("username") String username,
+                               @RequestParam("password") String password,
+                               HttpServletRequest request,
+                               HttpSession session) {
+
+//        Cookie[] cookies = request.getCookies();
+//        if (cookies != null && cookies.length > 0) {
+//            for (Cookie cookie : cookies) {
+//                System.out.println(cookie.getName() + " : " + cookie.getValue());
+//            }
+//        }
+
         User user = userRepository.getByUsername(username);
         if (user.getPassword().equals(password)) {
             if (user.isAdmin()) {
+
+                Object sessionUser = session.getAttribute("user");
+                if (sessionUser == null) {
+                    System.out.println("不存在session，设置user=" + username);
+                    session.setAttribute("user", user);
+                } else {
+                    System.out.println("存在session，user=" + sessionUser.toString());
+                }
+
                 return "ADMIN";
             } else if (!user.isEnable()) {
                 return "BAN";
             } else {
+
+                Object sessionUser = session.getAttribute("user");
+                if (sessionUser == null) {
+                    System.out.println("不存在session，设置user=" + username);
+                    session.setAttribute("user", user);
+                } else {
+                    System.out.println("存在session，user=" + sessionUser.toString());
+                }
+
                 return "USER";
             }
         } else {
             return "WRONG";
         }
+    }
+
+    @RequestMapping("/logout")
+    @ResponseBody
+    public Integer logout(HttpSession session){
+        session.removeAttribute("user");
+        return 200;
     }
 }
