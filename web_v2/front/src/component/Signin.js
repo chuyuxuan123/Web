@@ -10,21 +10,31 @@ import '../assets/css/signin.css';
 import Axios from 'axios';
 
 class Signin extends Component {
+
+    constructor(props){
+        super(props);
+        this.state = {
+            loading:false,
+        }
+    }
+
     //temporal signin handler
     //TODO: handle signin
     handleSubmit = (e) => {
         e.preventDefault();
-        console.log(e);
+        // console.log(e);
+        this.setState({loading:true});
         this.props.form.validateFields((err, values) => {
             if (!err) {
-                console.log('Received values of form: ', values);
+                // console.log('Received values of form: ', values);
                 Axios.get("http://localhost:8080/users/sign",{
                     params:{
                         username:values.userName,
                         password:values.password,
                     }
                 }).then((response)=>{
-                    console.log(response);
+                    // console.log(response);
+                    this.setState({loading:false});
                     if(response.data==="ADMIN"){
                         this.props.handleLogin(0);
                         this.props.setUsername(values.userName);
@@ -44,7 +54,10 @@ class Signin extends Component {
                     else{
                         message.error("登录出错");
                     }
-                }).catch();
+                }).catch((error)=>{
+                    this.setState({loading:false});
+                    message.error("登录出错，请稍后重试");
+                });
             }
         });
         
@@ -78,7 +91,7 @@ class Signin extends Component {
                             <Checkbox>记住账号密码</Checkbox>
                         )}
                         <a className="login-form-forgot" >忘记密码</a>
-                        <Button type="primary" htmlType="submit" className="login-form-button">
+                        <Button type="primary" loading={this.state.loading} htmlType="submit" className="login-form-button">
                             登&nbsp;录
               </Button>
                         没有账号？ <Link to="/register">注册新账号</Link>

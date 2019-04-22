@@ -71,6 +71,7 @@ public class UserController {
                 if (sessionUser == null) {
                     session.setAttribute("user", user);
                 }
+                session.setAttribute("user", user);
 
                 return "ADMIN";
             } else if (!user.isEnable()) {
@@ -81,6 +82,7 @@ public class UserController {
                 if (sessionUser == null) {
                     session.setAttribute("user", user);
                 }
+                session.setAttribute("user", user);
 
                 return "USER";
             }
@@ -93,6 +95,23 @@ public class UserController {
     @ResponseBody
     public Integer logout(HttpSession session) {
         session.removeAttribute("user");
+        session.removeAttribute("cart");
+        return 200;
+    }
+
+    @GetMapping("/validate")
+    @ResponseBody
+    public Integer validate(HttpSession session){
+        User user = (User)session.getAttribute("user");
+        if(user==null){
+            return 401;
+        }
+        if(user.isAdmin()){
+            return 202;
+        }
+        if(!user.isEnable()){
+            return 401;
+        }
         return 200;
     }
 }
