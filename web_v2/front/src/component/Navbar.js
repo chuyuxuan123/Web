@@ -101,6 +101,12 @@ export default class Navbar extends Component {
                 </Menu>)) :
                 (<Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
                     <Menu.Item key="1">
+                        <Link to="/booklist">
+                            <Icon type="read" />
+                            <span>图书列表</span>
+                        </Link>
+                    </Menu.Item>
+                    <Menu.Item key="2">
                         <Link to="/">
                             <Icon type="login" />
                             <span>登录</span>

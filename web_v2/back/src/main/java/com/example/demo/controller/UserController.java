@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
+
 @Controller
 @CrossOrigin
 @RequestMapping("/users")
@@ -47,18 +49,66 @@ public class UserController {
 
     @GetMapping("/sign")
     @ResponseBody
-    public String validateUser(@RequestParam("username") String username, @RequestParam("password") String password) {
+    public String validateUser(@RequestParam("username") String username,
+                               @RequestParam("password") String password,
+                               HttpSession session) {
+
+//        Cookie[] cookies = request.getCookies();
+//        if (cookies != null && cookies.length > 0) {
+//            for (Cookie cookie : cookies) {
+//                System.out.println(cookie.getName() + " : " + cookie.getValue());
+//            }
+//        }
+
         User user = userRepository.getByUsername(username);
         if (user.getPassword().equals(password)) {
             if (user.isAdmin()) {
+
+                Object sessionUser = session.getAttribute("user");
+                if (sessionUser == null) {
+                    session.setAttribute("user", user);
+                }
+                session.setAttribute("user", user);
+
                 return "ADMIN";
             } else if (!user.isEnable()) {
                 return "BAN";
             } else {
+
+                Object sessionUser = session.getAttribute("user");
+                if (sessionUser == null) {
+                    session.setAttribute("user", user);
+                }
+                session.setAttribute("user", user);
+
                 return "USER";
             }
         } else {
             return "WRONG";
         }
+    }
+
+    @RequestMapping("/logout")
+    @ResponseBody
+    public Integer logout(HttpSession session) {
+        session.removeAttribute("user");
+        session.removeAttribute("cart");
+        return 200;
+    }
+
+    @GetMapping("/validate")
+    @ResponseBody
+    public Integer validate(HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return 401;
+        }
+        if (user.isAdmin()) {
+            return 202;
+        }
+        if (!user.isEnable()) {
+            return 401;
+        }
+        return 200;
     }
 }

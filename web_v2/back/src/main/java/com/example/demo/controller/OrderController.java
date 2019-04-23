@@ -3,6 +3,7 @@ package com.example.demo.controller;
 
 import com.example.demo.model.Book;
 import com.example.demo.model.OrderItem;
+import com.example.demo.model.User;
 import com.example.demo.model.UserOrder;
 import com.example.demo.repository.BookRepository;
 import com.example.demo.repository.OrderItemRepository;
@@ -13,7 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 @Controller
@@ -33,28 +37,70 @@ public class OrderController {
     @Autowired
     private UserRepository userRepository;
 
-    @GetMapping("/all")
-    public @ResponseBody
-    Iterable<UserOrder> getAllOrders() {
-        return orderRepository.findAll();
-    }
-
     @GetMapping("/allItems")
     public @ResponseBody
     Iterable<OrderItem> getAllOrderItems() {
         return orderItemRepository.findAll();
     }
 
-    @GetMapping("/{username}/all")
+    @GetMapping(value = "/all", produces = "application/json;charset=UTF-8")
     public @ResponseBody
-    List<UserOrder> getUserAllOrders(@PathVariable("username") String username) {
-        return orderRepository.findByUser_Username(username);
+    String getUserAllOrders(HttpSession session) {
+
+        User user = (User) session.getAttribute("user");
+        if (user.isAdmin()) {
+            Iterable<UserOrder> userOrders = orderRepository.findAll();
+            ArrayList<JSONObject> returnToFront = new ArrayList<JSONObject>();
+
+
+            Iterator<UserOrder> iterator = userOrders.iterator();
+            while (iterator.hasNext()) {
+                UserOrder userOrder = iterator.next();
+                List<OrderItem> orderItems = userOrder.getOrderItems();
+                for (int j = 0; j < orderItems.size(); j++) {
+                    OrderItem orderItem = orderItems.get(j);
+
+                    JSONObject jsonObject = new JSONObject();
+
+                    jsonObject.put("orderId", userOrder.getOrderId());
+                    jsonObject.put("createTime", userOrder.getCreateTime());
+                    jsonObject.put("username", userOrder.getUser().getUsername());
+                    jsonObject.put("bookname", orderItem.getBook().getBookname());
+                    jsonObject.put("amount", orderItem.getAmount());
+                    jsonObject.put("isbn", orderItem.getBook().getIsbn());
+
+                    returnToFront.add(jsonObject);
+                }
+            }
+            return returnToFront.toString();
+
+        } else {
+
+            List<UserOrder> userOrders = orderRepository.findByUser_Username(user.getUsername());
+            ArrayList<JSONObject> returnToFront = new ArrayList<JSONObject>();
+            for (int i = 0; i < userOrders.size(); i++) {
+                UserOrder userOrder = userOrders.get(i);
+                List<OrderItem> orderItems = userOrder.getOrderItems();
+                for (int j = 0; j < orderItems.size(); j++) {
+                    OrderItem orderItem = orderItems.get(j);
+
+                    JSONObject jsonObject = new JSONObject();
+
+                    jsonObject.put("orderId", userOrder.getOrderId());
+                    jsonObject.put("createTime", userOrder.getCreateTime());
+                    jsonObject.put("username", userOrder.getUser().getUsername());
+                    jsonObject.put("bookname", orderItem.getBook().getBookname());
+                    jsonObject.put("amount", orderItem.getAmount());
+                    jsonObject.put("isbn", orderItem.getBook().getIsbn());
+
+                    returnToFront.add(jsonObject);
+                }
+            }
+
+            return returnToFront.toString();
+        }
     }
 
-//    @GetMapping("/{username}/jsonall")
-//    public @ResponseBody
-//    List<JSONObject> getJson(@PathVariable("username") String username){
-//    }
 
     @PostMapping(value = "/{username}/buy")
     public @ResponseBody
@@ -76,7 +122,9 @@ public class OrderController {
         userOrder.setCreateTime(date);
         orderRepository.save(userOrder);
         orderItemRepository.save(orderItem);
-        return 404;
+        book.setInventory(book.getInventory() - jsonObject.getInt("amount"));
+        bookRepository.save(book);
+        return 200;
     }
 
 }

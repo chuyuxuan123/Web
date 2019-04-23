@@ -27,4 +27,8 @@ public class UserOrder {
 
     @OneToMany(mappedBy = "userOrder")
     private List<OrderItem> orderItems;
+
+    private Integer totalPrice;
+
+    private boolean deleted;
 }

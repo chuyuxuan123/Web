@@ -2,23 +2,32 @@ package com.example.demo.model;
 
 import lombok.Data;
 
-import javax.persistence.*;
+//@Entity
+//@Data
+//public class CartItem {
+//
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    private Long cartItemId;
+//
+//    @ManyToOne
+//    @JoinColumn(name = "userId")
+//    private User user;
+//
+//    @OneToOne
+//    @JoinColumn(name = "bookId")
+//    private Book book;
+//
+//    private int amount;
+//}
 
-@Entity
 @Data
 public class CartItem {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long cartItemId;
+    private String bookname;
 
-    @ManyToOne
-    @JoinColumn(name = "userId")
-    private User user;
+    private Integer amount;
 
-    @OneToOne
-    @JoinColumn(name = "bookId")
-    private Book book;
+    private Integer price;
 
-    private int amount;
 }

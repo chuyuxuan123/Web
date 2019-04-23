@@ -10,6 +10,7 @@ import ModifyBookForm from './ModifyBookForm';
 
 import '../assets/css/booklist.css';
 import Axios from 'axios';
+import { message } from 'antd';
 
 let GLOBALKEY = 8;
 
@@ -82,7 +83,7 @@ export default class Booklist extends Component {
         }
     }
 
-    componentDidMount() {
+    componentWillMount() {
         this.fetch();
     }
 
@@ -105,7 +106,9 @@ export default class Booklist extends Component {
                 // console.log(data);
                 this.setState({loading:false,dataSource:n});
             })
-            .catch(function (error) {
+            .catch( (error) => {
+                this.setState({loading:false});
+                message.error("获取数据出错，请稍后重试");
                 console.log(error);
             });
     }
