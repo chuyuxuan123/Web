@@ -2,8 +2,6 @@ package com.example.demo.model;
 
 import lombok.Data;
 
-import javax.persistence.*;
-
 //@Entity
 //@Data
 //public class CartItem {
@@ -24,7 +22,7 @@ import javax.persistence.*;
 //}
 
 @Data
-public class CartItem{
+public class CartItem {
 
     private String bookname;
 

@@ -7,7 +7,7 @@ public class Cart {
 
     private List<CartItem> cartItemList;
 
-    public Cart(){
+    public Cart() {
         cartItemList = new ArrayList<CartItem>();
     }
 
@@ -15,12 +15,12 @@ public class Cart {
         return cartItemList;
     }
 
-    public void add(CartItem cartItem){
+    public void add(CartItem cartItem) {
         cartItemList.add(cartItem);
         return;
     }
 
-    public void remove(CartItem cartItem){
+    public void remove(CartItem cartItem) {
         cartItemList.remove(cartItem);
         return;
     }

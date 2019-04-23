@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 @Controller
@@ -52,7 +51,6 @@ public class UserController {
     @ResponseBody
     public String validateUser(@RequestParam("username") String username,
                                @RequestParam("password") String password,
-                               HttpServletRequest request,
                                HttpSession session) {
 
 //        Cookie[] cookies = request.getCookies();
@@ -63,7 +61,6 @@ public class UserController {
 //        }
 
         User user = userRepository.getByUsername(username);
-//        User user = new User(userRepository.getByUsername(username));
         if (user.getPassword().equals(password)) {
             if (user.isAdmin()) {
 
@@ -101,15 +98,15 @@ public class UserController {
 
     @GetMapping("/validate")
     @ResponseBody
-    public Integer validate(HttpSession session){
-        User user = (User)session.getAttribute("user");
-        if(user==null){
+    public Integer validate(HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
             return 401;
         }
-        if(user.isAdmin()){
+        if (user.isAdmin()) {
             return 202;
         }
-        if(!user.isEnable()){
+        if (!user.isEnable()) {
             return 401;
         }
         return 200;

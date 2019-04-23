@@ -15,50 +15,42 @@ import java.util.List;
 @RequestMapping("/cartItems")
 public class CartItemController {
 
-//    @Autowired
-//    private CartItemRepository cartItemRepository;
-
-//    @GetMapping("/{username}/all")
-//    public @ResponseBody
-//    List<CartItem> getByUser_Username(@PathVariable("username") String user,
-//                                      HttpSession session) {
-//        Object sessionCart = session.getAttribute("cart");
-//
-//        for (CartItem c : cartItemRepository.findByUser_Username(user)
-//        ) {
-//            JSONObject jsonObject = new JSONObject("{'orderId':" + c.getCartItemId() + "," + "}");
-//
-//        }
-//        return cartItemRepository.findByUser_Username(user);
-//    }
     @GetMapping("/all")
-    public @ResponseBody List<CartItem> getAllCartItems(HttpSession session){
+    public @ResponseBody
+    List<CartItem> getAllCartItems(HttpSession session) {
 //        System.out.println(session.getId());
-        User user = (User)session.getAttribute("user");
-        if(session.getAttribute("cart")==null){
+        User user = (User) session.getAttribute("user");
+        if (session.getAttribute("cart") == null) {
             Cart cart = new Cart();
-            session.setAttribute("cart",cart);
+            session.setAttribute("cart", cart);
         }
-        return ((Cart)(session.getAttribute("cart"))).getCartItemList();
+        return ((Cart) (session.getAttribute("cart"))).getCartItemList();
     }
 
     @PostMapping("/add")
-    public @ResponseBody Integer addCartItem(@RequestBody String data, HttpSession session){
+    public @ResponseBody
+    Integer addCartItem(@RequestBody String data, HttpSession session) {
 //        System.out.println(session.getId());
-        User user = (User)session.getAttribute("user");
+        User user = (User) session.getAttribute("user");
         JSONObject jsonObject = new JSONObject(data);
-        if(session.getAttribute("cart")==null){
+        if (session.getAttribute("cart") == null) {
             Cart cart = new Cart();
-            session.setAttribute("cart",cart);
+            session.setAttribute("cart", cart);
         }
 
-        Cart cart = (Cart)session.getAttribute("cart");
+        Cart cart = (Cart) session.getAttribute("cart");
         CartItem cartItem = new CartItem();
         cartItem.setBookname(jsonObject.getString("bookname"));
         cartItem.setAmount(jsonObject.getInt("amount"));
         cartItem.setPrice(jsonObject.getInt("price"));
         cart.add(cartItem);
 
+        return 200;
+    }
+
+    @GetMapping("/buy")
+    public @ResponseBody
+    Integer buyAllItems(HttpSession session){
         return 200;
     }
 
