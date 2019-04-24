@@ -8,7 +8,7 @@ public class Cart {
     private List<CartItem> cartItemList;
 
     public Cart() {
-        cartItemList = new ArrayList<CartItem>();
+        cartItemList = new ArrayList<>();
     }
 
     public List<CartItem> getCartItemList() {
@@ -16,12 +16,30 @@ public class Cart {
     }
 
     public void add(CartItem cartItem) {
+        for (CartItem c : cartItemList
+        ) {
+            if (c.getBookname().equals(cartItem.getBookname())) {
+                c.setAmount(c.getAmount() + cartItem.getAmount());
+                return;
+            }
+        }
         cartItemList.add(cartItem);
-        return;
     }
 
     public void remove(CartItem cartItem) {
         cartItemList.remove(cartItem);
-        return;
+    }
+
+    public void removeAll() {
+        cartItemList.clear();
+    }
+
+    public void removeByBookname(String bookname) {
+        for (int i = 0; i < cartItemList.size(); i++) {
+            if (cartItemList.get(i).getBookname().contentEquals(bookname)) {
+                cartItemList.remove(i);
+                return;
+            }
+        }
     }
 }

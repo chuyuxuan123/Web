@@ -16,6 +16,7 @@ import Orders from './Orders';
 import Axios from 'axios';
 import { message } from 'antd';
 
+
 const {
   Header, Content, Footer
 } = Layout;
@@ -31,6 +32,31 @@ class App extends Component {
     };
   }
 
+  componentDidMount(){
+    Axios.get("http://localhost:8080/users/validate")
+    .then((response)=>{
+      if(response.data==200){
+        
+        this.setState({
+          username: '',
+          login: true,
+          isAdmin: false,
+        });
+      }else if(response.data==202){
+        this.setState({
+          username: '',
+          login: true,
+          isAdmin: true,
+        });
+      }else{
+        this.setState({
+          username: '',
+          login: false,
+          isAdmin: false,
+        });
+      };
+    })
+  }
   // call setState in componentWillUpdate() will cause infinite loop
   // call componentDidUpdate is inproperty here because each time react component update this function will be invoked
   // componentDidUpdate(prevState) {

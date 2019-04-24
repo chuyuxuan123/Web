@@ -64,6 +64,12 @@ export default class Orders extends Component {
     });
   }
 
+  setDataSource=(newData)=>{
+    this.setState({
+      dataSource:newData,
+    });
+  }
+
   render() {
     const columnsAdmin = [{
       title: "订单号",
@@ -118,7 +124,7 @@ export default class Orders extends Component {
 
     return (
       <div>
-        <StatisticForm isAdmin={this.props.isAdmin} />
+        <StatisticForm isAdmin={this.props.isAdmin} setDataSource={this.setDataSource} />
         {this.props.isAdmin ?
           <Table columns={columnsAdmin} dataSource={this.state.dataSource} /> :
           <Table columns={columnsUser} dataSource={this.state.dataSource} />}

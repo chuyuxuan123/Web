@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpSession;
 
 @Controller
@@ -100,6 +101,7 @@ public class UserController {
     @ResponseBody
     public Integer validate(HttpSession session) {
         User user = (User) session.getAttribute("user");
+//        System.out.println(session.getId());
         if (user == null) {
             return 401;
         }

@@ -70,7 +70,7 @@ export default class BookDetail extends Component {
       "bookname": this.state.bookname
     };
 
-    Axios.post("http://localhost:8080/orders/" + this.props.username + "/buy", data, {
+    Axios.post("http://localhost:8080/orders/buy", data, {
       headers: { "Content-Type": "application/json" }
     }).then((response) => {
       if (response.data == 200) {

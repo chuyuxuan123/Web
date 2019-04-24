@@ -7,6 +7,7 @@ import org.json.JSONObject;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.jws.soap.SOAPBinding;
 import javax.servlet.http.HttpSession;
 import java.util.List;
 
@@ -27,6 +28,7 @@ public class CartItemController {
         return ((Cart) (session.getAttribute("cart"))).getCartItemList();
     }
 
+    //TODO:考虑把一件商品添加到购物车中时，商品的价格会不会改变
     @PostMapping("/add")
     public @ResponseBody
     Integer addCartItem(@RequestBody String data, HttpSession session) {
@@ -48,10 +50,17 @@ public class CartItemController {
         return 200;
     }
 
-    @GetMapping("/buy")
+    @GetMapping("/remove")
     public @ResponseBody
-    Integer buyAllItems(HttpSession session){
-        return 200;
+    String removeCartItem(@RequestParam("bookname") String bookname, HttpSession session) {
+//        System.out.println(bookname);
+        User user = (User) session.getAttribute("user");
+        Cart cart = (Cart) session.getAttribute("cart");
+        cart.removeByBookname(bookname);
+
+        return "200";
+
     }
+
 
 }
