@@ -64,11 +64,12 @@ class StatisticForm extends Component {
                 }
                 <Form.Item>
                     {
+                        this.props.isAdmin &&
                         getFieldDecorator("bookname")
                             (
                                 <Input prefix={<Icon type="book" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="筛选书名" />
-                            )}
-
+                            )
+                    }
                 </Form.Item>
                 <Form.Item>
                     <Button type="primary" htmlType="submit" >搜索订单</Button>

@@ -57,7 +57,7 @@ export default class Orders extends Component {
         const element = gotdata[index];       
         ret.push(makeData(element.orderId, element.createTime, element.username, element.bookname, element.amount, element.isbn));
       }
-      console.log(ret);
+      // console.log(ret);
       this.setState({ dataSource: ret });
     }).catch(function (error) {
       console.log(error);

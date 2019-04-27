@@ -33,9 +33,20 @@ export default class Cart extends Component {
 
   constructor(props) {
     super(props);
+    Axios.get("http://localhost:8080/users/validate").then((response)=>{
+      if(response.data==401){
+        message.warn("登录过期，请重新登录");
+        window.location.href="/";
+        return;
+      }
+    }).catch((error)=>{
+      message.error("网络出错!");
+      window.location.href="/";
+    });
     this.state = {
       totalPrice: 0,
       dataSource: [],
+      buttonDisabled: true,
       selectedRowKeys: [],
       selectedRows: [],
     }
@@ -50,7 +61,7 @@ export default class Cart extends Component {
       .then((response) => {
         // console.log(response);
         var d = response.data;
-        var n = new Array;
+        var n = new Array();
         for (let index = 0; index < d.length; index++) {
           const element = d[index];
           n.push({ "key": index, "bookname": element.bookname, "price": element.price, "amount": element.amount })
@@ -92,38 +103,69 @@ export default class Cart extends Component {
     });
   }
 
-  handleRemove=(e,item)=>{
+  handleRemove = (e, item) => {
     // console.log(e);
     // console.log(item);
-    Axios.get("http://localhost:8080/cartItems/remove",{
-      params:{
-        bookname:item.bookname,
+    Axios.get("http://localhost:8080/cartItems/remove", {
+      params: {
+        bookname: item.bookname,
       }
-    }).then((response)=>{
+    }).then((response) => {
       let oldData = [...this.state.dataSource];
       for (let index = 0; index < oldData.length; index++) {
-        if(oldData[index].bookname==item.bookname){
-          oldData.splice(index,1);
-        }       
+        if (oldData[index].bookname == item.bookname) {
+          oldData.splice(index, 1);
+        }
       }
-      this.setState({dataSource:oldData});
-      if(response.data=="200"){
+      this.setState({ dataSource: oldData });
+      if (response.data == "200") {
 
       }
-    }).catch((error)=>{
+    }).catch((error) => {
 
     });
   }
 
-  handlePurchase=()=>{
-    Axios.get("http://localhost:8080/orders/cart/buy").then((response)=>{
-      if(response.data==200){
+  handlePurchase = () => {
+    var rawList = this.state.selectedRows;
+
+    
+    var data = new Array();
+    for (let index = 0; index < rawList.length; index++) {
+      const element = rawList[index];
+      data.push({ "bookname": element.bookname, "amount": element.amount });
+    }
+
+    
+
+    Axios.post("http://localhost:8080/orders/cart/buy", data, {
+      'Content-Type': 'application/json',
+    }).then((response) => {
+      if (response.data == 200) {
         message.info("购买成功");
-        this.setState({dataSource:[],
-                      totalPrice:0});
-        // window.history.pushState({},'',"/booklist");
+        let oldData = [...this.state.dataSource];
+        for (let index = 0; index < oldData.length; index++) {
+          for (let j = 0; j < data.length; j++) {
+            if (oldData[index].bookname == data[j].bookname) {
+              oldData.splice(index, 1);
+            }            
+          }
+        }
+        this.setState({dataSource:oldData});
+
       }
+      console.log(response);
     })
+
+
+    // Axios.get("http://localhost:8080/orders/cart/buy").then((response)=>{
+    //   if(response.data==200){
+    //     message.info("购买成功");
+    //     this.setState({dataSource:[],
+    //                   totalPrice:0});
+    //     // window.history.pushState({},'',"/booklist");
+    //   }
+    // })
   }
 
   render() {
@@ -141,9 +183,9 @@ export default class Cart extends Component {
     }, {
       title: '操作',
       render: (item) => (
-      <Popconfirm title="确认删除?" okText="确认" cancelText="取消" onConfirm={(e) => { this.handleRemove(e, item) }}>
-        <a>移出购物车</a>
-      </Popconfirm>),
+        <Popconfirm title="确认删除?" okText="确认" cancelText="取消" onConfirm={(e) => { this.handleRemove(e, item) }}>
+          <a>移出购物车</a>
+        </Popconfirm>),
     }];
 
 
@@ -172,8 +214,11 @@ export default class Cart extends Component {
     return (
       <div>
         <h2>我的购物车</h2>
+        {/* <Table columns={columns} dataSource={this.state.dataSource} pagination={{ hideOnSinglePage: true }} />
+        <Button type="primary" size="large" id="buy" onClick={this.handlePurchase} disabled={this.state.dataSource<=0} >结算</Button>         */}
+
         <Table rowSelection={rowSelection} columns={columns} dataSource={this.state.dataSource} pagination={{ hideOnSinglePage: true }} />
-        <Button type="primary" size="large" id="buy" onClick={this.handlePurchase} >结算</Button>
+        <Button type="primary" size="large" id="buy" onClick={this.handlePurchase} disabled={this.state.selectedRows.length <= 0} >结算</Button>
         <div id="total">
           <Statistic title="合计" value={this.state.totalPrice} precision={2} suffix="￥" />
         </div>

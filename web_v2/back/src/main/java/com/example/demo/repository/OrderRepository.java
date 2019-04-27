@@ -10,4 +10,5 @@ public interface OrderRepository extends CrudRepository<UserOrder, Long> {
     List<UserOrder> findByUser_Username(String username);
 
     List<UserOrder> findByCreateTimeBetweenAndUser_Username(Date startDate, Date endDate, String username);
+
 }

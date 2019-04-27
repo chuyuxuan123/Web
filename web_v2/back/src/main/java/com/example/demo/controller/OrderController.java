@@ -6,12 +6,12 @@ import com.example.demo.repository.BookRepository;
 import com.example.demo.repository.OrderItemRepository;
 import com.example.demo.repository.OrderRepository;
 import com.example.demo.repository.UserRepository;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import javax.jws.soap.SOAPBinding;
 import javax.servlet.http.HttpSession;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -181,40 +181,40 @@ public class OrderController {
         return 200;
     }
 
-    @GetMapping("/cart/buy")
+    //TODO:只能一次处理所有的订单，并且出错之后无法撤销
+    @PostMapping("/cart/buy")
     public @ResponseBody
-    Integer buyAllItems(HttpSession session) {
-        System.out.println("catch signal");
-        User user = (User) session.getAttribute("user");
-        Cart cart = (Cart) session.getAttribute("cart");
+    Integer buySome(HttpSession session,@RequestBody String items){
+        System.out.println(items);
+        JSONArray jsonItems = new JSONArray(items);
+        System.out.println(jsonItems);
 
+        User user = (User) session.getAttribute("user");
         UserOrder userOrder = new UserOrder();
         userOrder.setUser(user);
         List<OrderItem> orderItems = new ArrayList<>();
-
         userOrder.setOrderItems(orderItems);
 
         Integer totalPrice = 0;
-        //TODO:这部分代码逻辑是有问题的，购物车中只能表示当时书的价格
-        for (CartItem cartItem : cart.getCartItemList()
-        ) {
+        for (Object item:jsonItems
+             ) {
             OrderItem orderItem = new OrderItem();
-            Book book = bookRepository.findByBookname(cartItem.getBookname());
+            Book book = bookRepository.findByBookname(((JSONObject)item).getString("bookname"));
 
             orderItem.setUserOrder(userOrder);
-            orderItem.setPrice(cartItem.getPrice());
-            orderItem.setAmount(cartItem.getAmount());
+            orderItem.setPrice(book.getPrice());
+            orderItem.setAmount(((JSONObject)item).getInt("amount"));
             orderItem.setBook(book);
 
-            book.setInventory(book.getInventory() - cartItem.getAmount());
+            book.setInventory(book.getInventory() - ((JSONObject)item).getInt("amount"));
             bookRepository.save(book);
 
             orderItems.add(orderItem);
 
-//            orderItemRepository.save(orderItem);
-            totalPrice = totalPrice + cartItem.getPrice() * cartItem.getAmount();
-        }
+            totalPrice = totalPrice + ((JSONObject)item).getInt("amount")*book.getPrice();
 
+            ((Cart)session.getAttribute("cart")).removeByBookname(((JSONObject)item).getString("bookname"));
+        }
         userOrder.setTotalPrice(totalPrice);
         userOrder.setOrderItems(orderItems);
         for (OrderItem orderItem : orderItems
@@ -224,9 +224,57 @@ public class OrderController {
 
         orderRepository.save(userOrder);
 
-        cart.removeAll();
 
         return 200;
     }
+
+
+    //下面的代码主要的问题是只能把全部购物车中的书全部购买，修改后的代码在上面的函数中
+//    @GetMapping("/cart/buy")
+//    public @ResponseBody
+//    Integer buyAllItems(HttpSession session) {
+////        System.out.println("catch signal");
+//        User user = (User) session.getAttribute("user");
+//        Cart cart = (Cart) session.getAttribute("cart");
+//
+//        UserOrder userOrder = new UserOrder();
+//        userOrder.setUser(user);
+//        List<OrderItem> orderItems = new ArrayList<>();
+//
+//        userOrder.setOrderItems(orderItems);
+//
+//        Integer totalPrice = 0;
+//        for (CartItem cartItem : cart.getCartItemList()
+//        ) {
+//            OrderItem orderItem = new OrderItem();
+//            Book book = bookRepository.findByBookname(cartItem.getBookname());
+//
+//            orderItem.setUserOrder(userOrder);
+//            orderItem.setPrice(cartItem.getPrice());
+//            orderItem.setAmount(cartItem.getAmount());
+//            orderItem.setBook(book);
+//
+//            book.setInventory(book.getInventory() - cartItem.getAmount());
+//            bookRepository.save(book);
+//
+//            orderItems.add(orderItem);
+//
+////            orderItemRepository.save(orderItem);
+//            totalPrice = totalPrice + cartItem.getPrice() * cartItem.getAmount();
+//        }
+//
+//        userOrder.setTotalPrice(totalPrice);
+//        userOrder.setOrderItems(orderItems);
+//        for (OrderItem orderItem : orderItems
+//        ) {
+//            orderItemRepository.save(orderItem);
+//        }
+//
+//        orderRepository.save(userOrder);
+//
+//        cart.removeAll();
+//
+//        return 200;
+//    }
 
 }
