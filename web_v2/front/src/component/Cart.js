@@ -151,7 +151,7 @@ export default class Cart extends Component {
             }            
           }
         }
-        this.setState({dataSource:oldData});
+        this.setState({dataSource:oldData,totalPrice:0});
 
       }
       console.log(response);

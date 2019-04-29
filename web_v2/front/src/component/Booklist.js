@@ -100,10 +100,7 @@ export default class Booklist extends Component {
                     var t = d[i];
                     n.push({"key":t.bookId,"bookname":t.bookname,"author":t.author,"ISBN":t.isbn,"inventory":t.inventory,"cover":t.cover});
                 }
-                // console.log(n);
-                // console.log(d);
-                // console.log(p);
-                // console.log(data);
+
                 this.setState({loading:false,dataSource:n});
             })
             .catch( (error) => {
