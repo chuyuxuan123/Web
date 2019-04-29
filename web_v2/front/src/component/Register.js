@@ -22,8 +22,14 @@ class Register extends Component {
                         password:values.password,
                     }
                 }).then((response)=>{
-                    message.info("注册成功");
-                    window.location.href = "http://localhost:3000/";
+                    if(response.data=="saved"){
+                        message.info("注册成功");
+                        window.location.href = "/";
+                    }else if(response.data=="duplicate"){
+                        message.warn("用户名已经存在");
+                        this.props.form.resetFields();
+                    }
+                    
                 }).catch((error)=>{
                     console.log(error);
                     message.error("发生错误，请重试");
