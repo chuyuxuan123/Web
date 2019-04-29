@@ -38,6 +38,10 @@ public class UserController {
     @GetMapping("/registration")
     @ResponseBody
     public String addNewUser(@RequestParam("username") String username, @RequestParam("email") String email, @RequestParam("password") String password) {
+        if (userRepository.getByUsername(username) != null) {
+            return "duplicate";
+        }
+
         User user = new User();
         user.setAdmin(false);
         user.setUsername(username);

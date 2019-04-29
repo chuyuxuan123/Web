@@ -6,18 +6,17 @@ import com.example.demo.repository.BookRepository;
 import com.example.demo.repository.OrderItemRepository;
 import com.example.demo.repository.OrderRepository;
 import com.example.demo.repository.UserRepository;
+import javafx.print.Collation;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 @Controller
 @CrossOrigin("http://localhost:3000")
@@ -73,6 +72,7 @@ public class OrderController {
                     returnToFront.add(jsonObject);
                 }
             }
+            Collections.reverse(returnToFront);
             return returnToFront.toString();
 
         } else {
@@ -97,7 +97,7 @@ public class OrderController {
                     returnToFront.add(jsonObject);
                 }
             }
-
+            Collections.reverse(returnToFront);
             return returnToFront.toString();
         }
     }
@@ -151,6 +151,7 @@ public class OrderController {
 
 
     @PostMapping(value = "/buy")
+    @Transactional(rollbackFor = Exception.class)
     public @ResponseBody
     Integer addOrder(@RequestBody String data,
                      HttpSession session) {
@@ -183,6 +184,7 @@ public class OrderController {
 
     //TODO:只能一次处理所有的订单，并且出错之后无法撤销
     @PostMapping("/cart/buy")
+    @Transactional(rollbackFor = Exception.class)
     public @ResponseBody
     Integer buySome(HttpSession session,@RequestBody String items){
         System.out.println(items);

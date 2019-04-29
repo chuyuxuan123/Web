@@ -125,9 +125,11 @@ export default class BookDetail extends Component {
           <Statistic title="库存" value={this.state.inventory} style={{ margin: "12px" }} />
           <label>选择数量:&nbsp;</label>
           <InputNumber min={1} max={parseInt(this.state.inventory)} value={this.state.amount} size="large" onChange={this.handleAmount} />
+          {this.state.inventory==0 && <p style={{'color':'red'}} >目前库存不足</p>}
           <br />
-          <Button type="primary" size="large" style={{ margin: "10px" }} onClick={this.handlePurchase} >立即购买</Button>
-          <Button type="default" size="large" style={{ margin: "10px" }} onClick={this.handleAddToCart} >添加到购物车</Button>
+          
+          <Button type="primary" size="large" style={{ margin: "10px" }} onClick={this.handlePurchase} disabled={this.state.inventory==0} >立即购买</Button>
+          <Button type="default" size="large" style={{ margin: "10px" }} onClick={this.handleAddToCart} disabled={this.state.inventory==0} >添加到购物车</Button>
         </div>
       </div>
     )

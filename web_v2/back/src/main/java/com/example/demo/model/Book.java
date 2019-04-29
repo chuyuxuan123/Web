@@ -3,6 +3,7 @@ package com.example.demo.model;
 import lombok.Data;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
 
 @Entity
 @Data
@@ -19,6 +20,7 @@ public class Book {
 
     private String author;
 
+    @Min(value = 0, message = "库存不足")
     private Integer inventory;
 
     private String cover;
