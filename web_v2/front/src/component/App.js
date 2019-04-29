@@ -12,9 +12,12 @@ import Booklist from './Booklist';
 import AccountManage from './AccountManage';
 import BookDetail from './BookDetail';
 import Cart from './Cart';
-import Orders from './Orders';
+// import Orders from './Orders';
+import AOrder from './AOrder';
+
 import Axios from 'axios';
 import { message } from 'antd';
+
 
 const {
   Header, Content, Footer
@@ -31,6 +34,31 @@ class App extends Component {
     };
   }
 
+  componentDidMount(){
+    Axios.get("http://localhost:8080/users/validate")
+    .then((response)=>{
+      if(response.data==200){
+        
+        this.setState({
+          username: '',
+          login: true,
+          isAdmin: false,
+        });
+      }else if(response.data==202){
+        this.setState({
+          username: '',
+          login: true,
+          isAdmin: true,
+        });
+      }else{
+        this.setState({
+          username: '',
+          login: false,
+          isAdmin: false,
+        });
+      };
+    })
+  }
   // call setState in componentWillUpdate() will cause infinite loop
   // call componentDidUpdate is inproperty here because each time react component update this function will be invoked
   // componentDidUpdate(prevState) {
@@ -116,7 +144,7 @@ class App extends Component {
                     <Route exact path="/" render={props => <Redirect to="/booklist" />} />
                     <Route exact path="/booklist" render={props => <Booklist isAdmin={this.state.isAdmin} />} />
                     <Route exact path="/cart" render={props => <Cart />} />
-                    <Route exact path="/orders" render={props => <Orders isAdmin={this.state.isAdmin} />} />
+                    <Route exact path="/orders" render={props => <AOrder isAdmin={this.state.isAdmin} />} />
                     <Route path="/detail/:isbn" render={props => <BookDetail {...props} username={this.state.username} />} />
                     <Route exact path="/settings" />
                     <Route render={props => <Redirect to="/booklist" />} />
@@ -129,7 +157,7 @@ class App extends Component {
                     <Route exact path="/" render={props => <Redirect to="/booklist" />} />
                     <Route exact path="/booklist" render={props => <Booklist isAdmin={this.state.isAdmin} />} />
                     <Route exact path="/account" render={props => <AccountManage />} />
-                    <Route exact path="/orders" render={props => <Orders isAdmin={this.state.isAdmin} />} />
+                    <Route exact path="/orders" render={props => <AOrder isAdmin={this.state.isAdmin} />} />
                     <Route exact path="/settings" />
                     <Route render={props => <Redirect to="/booklist" />} />
                   </Switch>

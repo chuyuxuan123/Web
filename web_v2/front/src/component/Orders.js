@@ -57,10 +57,16 @@ export default class Orders extends Component {
         const element = gotdata[index];       
         ret.push(makeData(element.orderId, element.createTime, element.username, element.bookname, element.amount, element.isbn));
       }
-      console.log(ret);
+      // console.log(ret);
       this.setState({ dataSource: ret });
     }).catch(function (error) {
       console.log(error);
+    });
+  }
+
+  setDataSource=(newData)=>{
+    this.setState({
+      dataSource:newData,
     });
   }
 
@@ -118,7 +124,7 @@ export default class Orders extends Component {
 
     return (
       <div>
-        <StatisticForm isAdmin={this.props.isAdmin} />
+        <StatisticForm isAdmin={this.props.isAdmin} setDataSource={this.setDataSource} />
         {this.props.isAdmin ?
           <Table columns={columnsAdmin} dataSource={this.state.dataSource} /> :
           <Table columns={columnsUser} dataSource={this.state.dataSource} />}

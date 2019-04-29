@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 
-import { Table, InputNumber, Statistic, Button } from 'antd';
+import { Table, InputNumber, Statistic, Button, Popconfirm } from 'antd';
 
 import '../assets/css/cart.css';
 import Axios from 'axios';
+import { message } from 'antd';
 
 // fixed data
 // const data = [{
@@ -32,33 +33,44 @@ export default class Cart extends Component {
 
   constructor(props) {
     super(props);
+    Axios.get("http://localhost:8080/users/validate").then((response)=>{
+      if(response.data==401){
+        message.warn("登录过期，请重新登录");
+        window.location.href="/";
+        return;
+      }
+    }).catch((error)=>{
+      message.error("网络出错!");
+      window.location.href="/";
+    });
     this.state = {
       totalPrice: 0,
       dataSource: [],
+      buttonDisabled: true,
       selectedRowKeys: [],
       selectedRows: [],
     }
   }
 
-  componentDidMount(){
+  componentDidMount() {
     this.fetch();
   }
 
-  fetch = ()=>{
+  fetch = () => {
     Axios.get("http://localhost:8080/cartItems/all")
-    .then((response)=>{
-      // console.log(response);
-      var d = response.data;
-      var n = new Array;
-      for (let index = 0; index < d.length; index++) {
-        const element = d[index];
-        n.push({"key":index,"bookname":element.bookname,"price":element.price,"amount":element.amount})
-      }
-      this.setState({dataSource:n});
-    })
-    .catch((error)=>{
-      console.log(error);
-    })
+      .then((response) => {
+        // console.log(response);
+        var d = response.data;
+        var n = new Array();
+        for (let index = 0; index < d.length; index++) {
+          const element = d[index];
+          n.push({ "key": index, "bookname": element.bookname, "price": element.price, "amount": element.amount })
+        }
+        this.setState({ dataSource: n });
+      })
+      .catch((error) => {
+        console.log(error);
+      })
   }
 
   handleAmount = (value, item) => {
@@ -91,6 +103,78 @@ export default class Cart extends Component {
     });
   }
 
+  handleRemove = (e, item) => {
+    // console.log(e);
+    // console.log(item);
+    Axios.get("http://localhost:8080/cartItems/remove", {
+      params: {
+        bookname: item.bookname,
+      }
+    }).then((response) => {
+      let oldData = [...this.state.dataSource];
+      for (let index = 0; index < oldData.length; index++) {
+        if (oldData[index].bookname == item.bookname) {
+          oldData.splice(index, 1);
+        }
+      }
+      this.setState({ dataSource: oldData });
+      if (response.data == "200") {
+
+      }
+    }).catch((error) => {
+
+    });
+  }
+
+  handlePurchase = () => {
+    var rawList = this.state.selectedRows;
+
+    
+    var data = new Array();
+    for (let index = 0; index < rawList.length; index++) {
+      const element = rawList[index];
+      data.push({ "bookname": element.bookname, "amount": element.amount });
+    }
+
+    
+
+    Axios.post("http://localhost:8080/orders/cart/buy", data, {
+      'Content-Type': 'application/json',
+    }).then((response) => {
+      if (response.data == 200) {
+        message.info("购买成功");
+        let oldData = [...this.state.dataSource];
+        for (let index = 0; index < oldData.length; index++) {
+          for (let j = 0; j < data.length; j++) {
+            if (oldData[index].bookname == data[j].bookname) {
+              oldData.splice(index, 1);
+            }            
+          }
+        }
+        this.setState({dataSource:oldData,totalPrice:0});
+
+      }
+      console.log(response);
+    }).catch((error)=>{
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        console.log(error.response.data);
+        console.log(error.response.status);
+        console.log(error.response.headers);
+      } else if (error.request) {
+        // The request was made but no response was received
+        // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+        // http.ClientRequest in node.js
+        console.log(error.request);
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        console.log('Error', error.message);
+      }
+      console.log(error.config);
+    })
+  }
+
   render() {
     const columns = [{
       title: '书名',
@@ -105,7 +189,10 @@ export default class Cart extends Component {
       render: (key, item) => <InputNumber min={1} defaultValue={item.amount} onChange={(value) => { this.handleAmount(value, item) }} />
     }, {
       title: '操作',
-      render: () => <a style={{ color: "#f81d22" }}>移出购物车</a>,
+      render: (item) => (
+        <Popconfirm title="确认删除?" okText="确认" cancelText="取消" onConfirm={(e) => { this.handleRemove(e, item) }}>
+          <a>移出购物车</a>
+        </Popconfirm>),
     }];
 
 
@@ -114,7 +201,7 @@ export default class Cart extends Component {
     // rowSelection object indicates the need for row selection
     const rowSelection = {
       onChange: (selectedRowKeys, selectedRows) => {
-        console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+        // console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
         let totalPrice = 0;
         for (let i = 0; i < selectedRows.length; ++i) {
           totalPrice += selectedRows[i].amount * selectedRows[i].price;
@@ -134,8 +221,11 @@ export default class Cart extends Component {
     return (
       <div>
         <h2>我的购物车</h2>
+        {/* <Table columns={columns} dataSource={this.state.dataSource} pagination={{ hideOnSinglePage: true }} />
+        <Button type="primary" size="large" id="buy" onClick={this.handlePurchase} disabled={this.state.dataSource<=0} >结算</Button>         */}
+
         <Table rowSelection={rowSelection} columns={columns} dataSource={this.state.dataSource} pagination={{ hideOnSinglePage: true }} />
-        <Button type="primary" size="large" id="buy">结算</Button>
+        <Button type="primary" size="large" id="buy" onClick={this.handlePurchase} disabled={this.state.selectedRows.length <= 0} >结算</Button>
         <div id="total">
           <Statistic title="合计" value={this.state.totalPrice} precision={2} suffix="￥" />
         </div>
