@@ -12,7 +12,9 @@ import Booklist from './Booklist';
 import AccountManage from './AccountManage';
 import BookDetail from './BookDetail';
 import Cart from './Cart';
-import Orders from './Orders';
+// import Orders from './Orders';
+import AOrder from './AOrder';
+
 import Axios from 'axios';
 import { message } from 'antd';
 
@@ -142,7 +144,7 @@ class App extends Component {
                     <Route exact path="/" render={props => <Redirect to="/booklist" />} />
                     <Route exact path="/booklist" render={props => <Booklist isAdmin={this.state.isAdmin} />} />
                     <Route exact path="/cart" render={props => <Cart />} />
-                    <Route exact path="/orders" render={props => <Orders isAdmin={this.state.isAdmin} />} />
+                    <Route exact path="/orders" render={props => <AOrder isAdmin={this.state.isAdmin} />} />
                     <Route path="/detail/:isbn" render={props => <BookDetail {...props} username={this.state.username} />} />
                     <Route exact path="/settings" />
                     <Route render={props => <Redirect to="/booklist" />} />
@@ -155,7 +157,7 @@ class App extends Component {
                     <Route exact path="/" render={props => <Redirect to="/booklist" />} />
                     <Route exact path="/booklist" render={props => <Booklist isAdmin={this.state.isAdmin} />} />
                     <Route exact path="/account" render={props => <AccountManage />} />
-                    <Route exact path="/orders" render={props => <Orders isAdmin={this.state.isAdmin} />} />
+                    <Route exact path="/orders" render={props => <AOrder isAdmin={this.state.isAdmin} />} />
                     <Route exact path="/settings" />
                     <Route render={props => <Redirect to="/booklist" />} />
                   </Switch>

@@ -6,7 +6,6 @@ import com.example.demo.repository.BookRepository;
 import com.example.demo.repository.OrderItemRepository;
 import com.example.demo.repository.OrderRepository;
 import com.example.demo.repository.UserRepository;
-import javafx.print.Collation;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,20 +56,31 @@ public class OrderController {
             while (iterator.hasNext()) {
                 UserOrder userOrder = iterator.next();
                 List<OrderItem> orderItems = userOrder.getOrderItems();
+
+                JSONObject jsonOrder = new JSONObject();
+                jsonOrder.put("key", userOrder.getOrderId());
+                jsonOrder.put("orderId", userOrder.getOrderId());
+                jsonOrder.put("createTime", userOrder.getCreateTime());
+                jsonOrder.put("username", userOrder.getUser().getUsername());
+                jsonOrder.put("totalPrice", userOrder.getTotalPrice());
+
+                ArrayList<JSONObject> jsonOrderItems = new ArrayList<>();
+
                 for (int j = 0; j < orderItems.size(); j++) {
                     OrderItem orderItem = orderItems.get(j);
 
                     JSONObject jsonObject = new JSONObject();
 
-                    jsonObject.put("orderId", userOrder.getOrderId());
-                    jsonObject.put("createTime", userOrder.getCreateTime());
-                    jsonObject.put("username", userOrder.getUser().getUsername());
                     jsonObject.put("bookname", orderItem.getBook().getBookname());
                     jsonObject.put("amount", orderItem.getAmount());
+                    jsonObject.put("price", orderItem.getPrice());
                     jsonObject.put("isbn", orderItem.getBook().getIsbn());
 
-                    returnToFront.add(jsonObject);
+                    jsonOrderItems.add(jsonObject);
                 }
+                jsonOrder.put("detail", jsonOrderItems);
+                returnToFront.add(jsonOrder);
+
             }
             Collections.reverse(returnToFront);
             return returnToFront.toString();
@@ -79,28 +89,79 @@ public class OrderController {
 
             List<UserOrder> userOrders = orderRepository.findByUser_Username(user.getUsername());
             ArrayList<JSONObject> returnToFront = new ArrayList<>();
+
             for (int i = 0; i < userOrders.size(); i++) {
                 UserOrder userOrder = userOrders.get(i);
                 List<OrderItem> orderItems = userOrder.getOrderItems();
+
+                JSONObject jsonOrder = new JSONObject();
+                jsonOrder.put("key", userOrder.getOrderId());
+                jsonOrder.put("orderId", userOrder.getOrderId());
+                jsonOrder.put("createTime", userOrder.getCreateTime());
+                jsonOrder.put("username", userOrder.getUser().getUsername());
+                jsonOrder.put("totalPrice", userOrder.getTotalPrice());
+
+                ArrayList<JSONObject> jsonOrderItems = new ArrayList<>();
+
                 for (int j = 0; j < orderItems.size(); j++) {
                     OrderItem orderItem = orderItems.get(j);
 
                     JSONObject jsonObject = new JSONObject();
 
-                    jsonObject.put("orderId", userOrder.getOrderId());
-                    jsonObject.put("createTime", userOrder.getCreateTime());
-                    jsonObject.put("username", userOrder.getUser().getUsername());
                     jsonObject.put("bookname", orderItem.getBook().getBookname());
                     jsonObject.put("amount", orderItem.getAmount());
+                    jsonObject.put("price", orderItem.getPrice());
                     jsonObject.put("isbn", orderItem.getBook().getIsbn());
 
-                    returnToFront.add(jsonObject);
+                    jsonOrderItems.add(jsonObject);
                 }
+                jsonOrder.put("detail", jsonOrderItems);
+                returnToFront.add(jsonOrder);
+
             }
             Collections.reverse(returnToFront);
             return returnToFront.toString();
         }
     }
+
+//    @GetMapping(value= "/testget",produces = "application/json;charset=UTF-8")
+//    public @ResponseBody
+//    String test() {
+//
+//        List<UserOrder> userOrders = orderRepository.findByUser_Username("t3");
+//        ArrayList<JSONObject> returnToFront = new ArrayList<>();
+//
+//        for (int i = 0; i < userOrders.size(); i++) {
+//            UserOrder userOrder = userOrders.get(i);
+//            List<OrderItem> orderItems = userOrder.getOrderItems();
+//
+//            JSONObject jsonOrder = new JSONObject();
+//            jsonOrder.put("key", userOrder.getOrderId());
+//            jsonOrder.put("orderId", userOrder.getOrderId());
+//            jsonOrder.put("createTime", userOrder.getCreateTime());
+//            jsonOrder.put("username", userOrder.getUser().getUsername());
+//            jsonOrder.put("totalPrice",userOrder.getTotalPrice());
+//
+//            ArrayList<JSONObject> jsonOrderItems = new ArrayList<>();
+//
+//            for (int j = 0; j < orderItems.size(); j++) {
+//                OrderItem orderItem = orderItems.get(j);
+//
+//                JSONObject jsonObject = new JSONObject();
+//
+//                jsonObject.put("bookname", orderItem.getBook().getBookname());
+//                jsonObject.put("amount", orderItem.getAmount());
+//                jsonObject.put("price",orderItem.getPrice());
+//                jsonObject.put("isbn", orderItem.getBook().getIsbn());
+//
+//                jsonOrderItems.add(jsonObject);
+//            }
+//            jsonOrder.put("detail",jsonOrderItems);
+//            returnToFront.add(jsonOrder);
+//
+//        }
+//        return returnToFront.toString();
+//    }
 
     @GetMapping("/search")
     public @ResponseBody
@@ -116,28 +177,38 @@ public class OrderController {
 
             List<UserOrder> userOrders = orderRepository.findByCreateTimeBetweenAndUser_Username(startDate, endDate, user.getUsername());
             ArrayList<JSONObject> returnToFront = new ArrayList<>();
+
             for (int i = 0; i < userOrders.size(); i++) {
                 UserOrder userOrder = userOrders.get(i);
                 List<OrderItem> orderItems = userOrder.getOrderItems();
+
+                JSONObject jsonOrder = new JSONObject();
+                jsonOrder.put("key", userOrder.getOrderId());
+                jsonOrder.put("orderId", userOrder.getOrderId());
+                jsonOrder.put("createTime", userOrder.getCreateTime());
+                jsonOrder.put("username", userOrder.getUser().getUsername());
+                jsonOrder.put("totalPrice", userOrder.getTotalPrice());
+
+                ArrayList<JSONObject> jsonOrderItems = new ArrayList<>();
+
                 for (int j = 0; j < orderItems.size(); j++) {
                     OrderItem orderItem = orderItems.get(j);
 
                     JSONObject jsonObject = new JSONObject();
 
-                    jsonObject.put("orderId", userOrder.getOrderId());
-                    jsonObject.put("createTime", userOrder.getCreateTime());
-                    jsonObject.put("username", userOrder.getUser().getUsername());
                     jsonObject.put("bookname", orderItem.getBook().getBookname());
                     jsonObject.put("amount", orderItem.getAmount());
+                    jsonObject.put("price", orderItem.getPrice());
                     jsonObject.put("isbn", orderItem.getBook().getIsbn());
 
-                    returnToFront.add(jsonObject);
+                    jsonOrderItems.add(jsonObject);
                 }
-            }
+                jsonOrder.put("detail", jsonOrderItems);
+                returnToFront.add(jsonOrder);
 
+            }
             return returnToFront.toString();
 
-//            return orderRepository.findByCreateTimeBetweenAndUser_Username(startDate,endDate,user.getUsername());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -230,53 +301,5 @@ public class OrderController {
         return 200;
     }
 
-
-    //下面的代码主要的问题是只能把全部购物车中的书全部购买，修改后的代码在上面的函数中
-//    @GetMapping("/cart/buy")
-//    public @ResponseBody
-//    Integer buyAllItems(HttpSession session) {
-////        System.out.println("catch signal");
-//        User user = (User) session.getAttribute("user");
-//        Cart cart = (Cart) session.getAttribute("cart");
-//
-//        UserOrder userOrder = new UserOrder();
-//        userOrder.setUser(user);
-//        List<OrderItem> orderItems = new ArrayList<>();
-//
-//        userOrder.setOrderItems(orderItems);
-//
-//        Integer totalPrice = 0;
-//        for (CartItem cartItem : cart.getCartItemList()
-//        ) {
-//            OrderItem orderItem = new OrderItem();
-//            Book book = bookRepository.findByBookname(cartItem.getBookname());
-//
-//            orderItem.setUserOrder(userOrder);
-//            orderItem.setPrice(cartItem.getPrice());
-//            orderItem.setAmount(cartItem.getAmount());
-//            orderItem.setBook(book);
-//
-//            book.setInventory(book.getInventory() - cartItem.getAmount());
-//            bookRepository.save(book);
-//
-//            orderItems.add(orderItem);
-//
-////            orderItemRepository.save(orderItem);
-//            totalPrice = totalPrice + cartItem.getPrice() * cartItem.getAmount();
-//        }
-//
-//        userOrder.setTotalPrice(totalPrice);
-//        userOrder.setOrderItems(orderItems);
-//        for (OrderItem orderItem : orderItems
-//        ) {
-//            orderItemRepository.save(orderItem);
-//        }
-//
-//        orderRepository.save(userOrder);
-//
-//        cart.removeAll();
-//
-//        return 200;
-//    }
 
 }

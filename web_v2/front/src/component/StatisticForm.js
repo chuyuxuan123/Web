@@ -27,14 +27,14 @@ class StatisticForm extends Component {
                         bookname: "useless",
                     }
                 }).then((response) => {
-                    console.log(response.data);
-                    var gotdata = response.data;
-                    var ret = new Array();
-                    for (let index = 0; index < gotdata.length; index++) {
-                        const element = gotdata[index];
-                        ret.push(makeData(element.orderId, element.createTime, element.username, element.bookname, element.amount, element.isbn));
-                    }
-                    this.props.setDataSource(ret);
+                    // console.log(response.data);
+                    // var gotdata = response.data;
+                    // var ret = new Array();
+                    // for (let index = 0; index < gotdata.length; index++) {
+                    //     const element = gotdata[index];
+                    //     ret.push(makeData(element.orderId, element.createTime, element.username, element.bookname, element.amount, element.isbn));
+                    // }
+                    this.props.setDataSource(response.data);
                 }).catch((error) => {
                     console.log(error);
                 })
