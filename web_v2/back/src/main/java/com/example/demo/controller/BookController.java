@@ -1,7 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.Book;
-import com.example.demo.repository.BookRepository;
+import com.example.demo.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -13,22 +13,24 @@ import javax.servlet.http.HttpSession;
 @CrossOrigin("http://localhost:3000")
 @RequestMapping(path = "/books")
 public class BookController {
-    @Autowired
 
-    private BookRepository bookRepository;
+    private BookService bookService;
+
+    @Autowired
+    public BookController(BookService service) {
+        this.bookService = service;
+    }
 
     @GetMapping(path = "/all")
     public @ResponseBody
     Iterable<Book> getAllBooks() {
-        return bookRepository.findAll();
+        return bookService.getAllBooks();
     }
 
     @GetMapping(path = "/get")
     public @ResponseBody
-    Book getBookByISBN(@RequestParam String ISBN,
-                       HttpSession session) {
-//        System.out.println(session.getAttribute("user"));
-        return bookRepository.findByIsbn(ISBN);
+    Book getBookByISBN(@RequestParam String ISBN) {
+        return bookService.getBookByISBN(ISBN);
     }
 
 //    @GetMapping(path = "/add")

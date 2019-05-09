@@ -1,13 +1,14 @@
 package com.example.demo.controller;
 
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.example.demo.model.*;
 import com.example.demo.repository.BookRepository;
 import com.example.demo.repository.OrderItemRepository;
 import com.example.demo.repository.OrderRepository;
 import com.example.demo.repository.UserRepository;
-import org.json.JSONArray;
-import org.json.JSONObject;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,7 +45,7 @@ public class OrderController {
 
     @GetMapping(value = "/all", produces = "application/json;charset=UTF-8")
     public @ResponseBody
-    String getUserAllOrders(HttpSession session) {
+    List<JSONObject> getUserAllOrders(HttpSession session) {
 
         User user = (User) session.getAttribute("user");
         if (user.isAdmin()) {
@@ -60,6 +61,7 @@ public class OrderController {
                 JSONObject jsonOrder = new JSONObject();
                 jsonOrder.put("key", userOrder.getOrderId());
                 jsonOrder.put("orderId", userOrder.getOrderId());
+                //TODO:使用fastjson导致时间格式不对
                 jsonOrder.put("createTime", userOrder.getCreateTime());
                 jsonOrder.put("username", userOrder.getUser().getUsername());
                 jsonOrder.put("totalPrice", userOrder.getTotalPrice());
@@ -83,7 +85,7 @@ public class OrderController {
 
             }
             Collections.reverse(returnToFront);
-            return returnToFront.toString();
+            return returnToFront;
 
         } else {
 
@@ -120,7 +122,7 @@ public class OrderController {
 
             }
             Collections.reverse(returnToFront);
-            return returnToFront.toString();
+            return returnToFront;
         }
     }
 
@@ -165,10 +167,10 @@ public class OrderController {
 
     @GetMapping("/search")
     public @ResponseBody
-    String getOrdersByDateAndUsername(@RequestParam("start") String begin,
-                                      @RequestParam("end") String end,
-                                      @RequestParam("bookname") String bookname,
-                                      HttpSession session) {
+    List<JSONObject> getOrdersByDateAndUsername(@RequestParam("start") String begin,
+                                                @RequestParam("end") String end,
+                                                @RequestParam("bookname") String bookname,
+                                                HttpSession session) {
         User user = (User) session.getAttribute("user");
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         try {
@@ -207,7 +209,7 @@ public class OrderController {
                 returnToFront.add(jsonOrder);
 
             }
-            return returnToFront.toString();
+            return returnToFront;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -224,7 +226,7 @@ public class OrderController {
     @PostMapping(value = "/buy")
     @Transactional(rollbackFor = Exception.class)
     public @ResponseBody
-    Integer addOrder(@RequestBody String data,
+    Integer addOrder(@RequestBody JSONObject data,
                      HttpSession session) {
 //        System.out.println(data);
         User user = (User) session.getAttribute("user");
@@ -238,17 +240,17 @@ public class OrderController {
         OrderItem orderItem = new OrderItem();
         orderItem.setUserOrder(userOrder);
         orderItem.setBook(book);
-        orderItem.setAmount(jsonObject.getInt("amount"));
-        orderItem.setPrice(jsonObject.getInt("price"));
+        orderItem.setAmount(jsonObject.getInteger("amount"));
+        orderItem.setPrice(jsonObject.getInteger("price"));
 
-        Integer totalPrice = jsonObject.getInt("amount") * jsonObject.getInt("price");
+        Integer totalPrice = jsonObject.getInteger("amount") * jsonObject.getInteger("price");
         userOrder.setTotalPrice(totalPrice);
 
         Date date = new Date();
         userOrder.setCreateTime(date);
         orderRepository.save(userOrder);
         orderItemRepository.save(orderItem);
-        book.setInventory(book.getInventory() - jsonObject.getInt("amount"));
+        book.setInventory(book.getInventory() - jsonObject.getInteger("amount"));
         bookRepository.save(book);
         return 200;
     }
@@ -257,7 +259,7 @@ public class OrderController {
     @PostMapping("/cart/buy")
     @Transactional(rollbackFor = Exception.class)
     public @ResponseBody
-    Integer buySome(HttpSession session,@RequestBody String items){
+    Integer buySome(HttpSession session, @RequestBody JSONArray items) {
         System.out.println(items);
         JSONArray jsonItems = new JSONArray(items);
         System.out.println(jsonItems);
@@ -276,15 +278,15 @@ public class OrderController {
 
             orderItem.setUserOrder(userOrder);
             orderItem.setPrice(book.getPrice());
-            orderItem.setAmount(((JSONObject)item).getInt("amount"));
+            orderItem.setAmount(((JSONObject) item).getInteger("amount"));
             orderItem.setBook(book);
 
-            book.setInventory(book.getInventory() - ((JSONObject)item).getInt("amount"));
+            book.setInventory(book.getInventory() - ((JSONObject) item).getInteger("amount"));
             bookRepository.save(book);
 
             orderItems.add(orderItem);
 
-            totalPrice = totalPrice + ((JSONObject)item).getInt("amount")*book.getPrice();
+            totalPrice = totalPrice + ((JSONObject) item).getInteger("amount") * book.getPrice();
 
             ((Cart)session.getAttribute("cart")).removeByBookname(((JSONObject)item).getString("bookname"));
         }
