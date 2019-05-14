@@ -23,9 +23,10 @@ class Signin extends Component {
     handleSubmit = (e) => {
         e.preventDefault();
         // console.log(e);
-        this.setState({loading:true});
+        
         this.props.form.validateFields((err, values) => {
             if (!err) {
+                this.setState({loading:true});
                 // console.log('Received values of form: ', values);
                 Axios.get("http://localhost:8080/users/sign",{
                     params:{

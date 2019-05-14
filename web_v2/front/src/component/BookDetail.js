@@ -10,6 +10,7 @@ export default class BookDetail extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      bookId:'',
       bookname: '',
       author: '',
       price: '',
@@ -43,6 +44,7 @@ export default class BookDetail extends Component {
           .then((response) => {
             //  console.log(response);
             this.setState({
+              bookId: response.data.bookId,
               bookname: response.data.bookname,
               author: response.data.author,
               price: response.data.price,
@@ -63,12 +65,10 @@ export default class BookDetail extends Component {
   }
 
   handlePurchase = () => {
-    var data = {
-      "username": this.props.username,
-      "amount": this.state.amount,
-      "price": this.state.price,
-      "bookname": this.state.bookname
-    };
+    var data = [{
+      "bookId":this.state.bookId,
+      "amount": this.state.amount
+    }];
 
     Axios.post("http://localhost:8080/orders/buy", data, {
       headers: { "Content-Type": "application/json" }
@@ -82,7 +82,7 @@ export default class BookDetail extends Component {
 
   handleAddToCart = () => {
     var data = {
-      "username": this.props.username,
+      "bookId": this.state.bookId,
       "amount": this.state.amount,
       "price": this.state.price,
       "bookname": this.state.bookname

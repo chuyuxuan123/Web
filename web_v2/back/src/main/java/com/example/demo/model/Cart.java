@@ -18,7 +18,7 @@ public class Cart {
     public void add(CartItem cartItem) {
         for (CartItem c : cartItemList
         ) {
-            if (c.getBookname().equals(cartItem.getBookname())) {
+            if (c.getBookId().equals(cartItem.getBookId())) {
                 c.setAmount(c.getAmount() + cartItem.getAmount());
                 return;
             }
@@ -37,6 +37,15 @@ public class Cart {
     public void removeByBookname(String bookname) {
         for (int i = 0; i < cartItemList.size(); i++) {
             if (cartItemList.get(i).getBookname().contentEquals(bookname)) {
+                cartItemList.remove(i);
+                return;
+            }
+        }
+    }
+
+    public void removeByBookId(Integer bookId) {
+        for (int i = 0; i < cartItemList.size(); i++) {
+            if (cartItemList.get(i).getBookId() == bookId) {
                 cartItemList.remove(i);
                 return;
             }

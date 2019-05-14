@@ -41,6 +41,7 @@ public class CartItemController {
 
         Cart cart = (Cart) session.getAttribute("cart");
         CartItem cartItem = new CartItem();
+        cartItem.setBookId(jsonObject.getInteger("bookId"));
         cartItem.setBookname(jsonObject.getString("bookname"));
         cartItem.setAmount(jsonObject.getInteger("amount"));
         cartItem.setPrice(jsonObject.getInteger("price"));
@@ -51,11 +52,11 @@ public class CartItemController {
 
     @GetMapping("/remove")
     public @ResponseBody
-    String removeCartItem(@RequestParam("bookname") String bookname, HttpSession session) {
+    String removeCartItem(@RequestParam("bookId") Integer bookId, HttpSession session) {
 //        System.out.println(bookname);
         User user = (User) session.getAttribute("user");
         Cart cart = (Cart) session.getAttribute("cart");
-        cart.removeByBookname(bookname);
+        cart.removeByBookId(bookId);
 
         return "200";
 

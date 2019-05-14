@@ -27,7 +27,7 @@ public class UserOrder {
     @JoinColumn(name = "userId")
     private User user;
 
-    @OneToMany(mappedBy = "userOrder", cascade = {CascadeType.ALL})
+    @OneToMany(cascade = {CascadeType.ALL}, mappedBy = "userOrder")
     private List<OrderItem> orderItems;
 
     private Integer totalPrice;
