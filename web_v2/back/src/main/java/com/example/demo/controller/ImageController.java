@@ -15,7 +15,7 @@ import java.io.IOException;
 @RequestMapping("/image")
 public class ImageController {
 
-    @GetMapping(value = "/img/{id}", produces = MediaType.IMAGE_JPEG_VALUE)
+    @GetMapping(value = "/{id}", produces = MediaType.IMAGE_JPEG_VALUE)
     public @ResponseBody
     byte[] getImage(@PathVariable("id") String id) throws IOException {
         //TODO: pic url is fixed
@@ -31,6 +31,7 @@ public class ImageController {
     @PostMapping("/upload")
     @ResponseBody
     public String upload(@RequestParam("file") MultipartFile file) {
+//        System.out.println(file);
         if (file.isEmpty()) {
             return "上传失败，请选择文件";
         }

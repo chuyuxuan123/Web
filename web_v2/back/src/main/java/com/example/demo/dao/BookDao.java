@@ -13,5 +13,7 @@ public interface BookDao {
 
     Book findByBookId(Long bookId);
 
+    void deleteBook(Long bookId);
+
     void save(Book book);
 }

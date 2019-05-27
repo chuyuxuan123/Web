@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.google.common.collect.Lists;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
@@ -43,8 +44,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<JSONObject> getOrdersByDateAndUsername(Date begin, Date end, String bookname) {
-        List<UserOrder> userOrders = orderDao.findByCreateTimeBetweenAndUser_Username(begin, end, bookname);
+    public List<JSONObject> getOrdersByDateAndUsername(Date begin, Date end, String username) {
+        List<UserOrder> userOrders = orderDao.findByCreateTimeBetweenAndUser_Username(begin, end, username);
 
         return backToFront(userOrders);
     }
@@ -93,6 +94,7 @@ public class OrderServiceImpl implements OrderService {
 
     private List<JSONObject> backToFront(List<UserOrder> userOrders) {
         ArrayList<JSONObject> returnToFront = new ArrayList<JSONObject>();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         for (int i = 0; i < userOrders.size(); i++) {
             UserOrder userOrder = userOrders.get(i);
@@ -101,7 +103,7 @@ public class OrderServiceImpl implements OrderService {
             JSONObject jsonOrder = new JSONObject();
             jsonOrder.put("key", userOrder.getOrderId());
             jsonOrder.put("orderId", userOrder.getOrderId());
-            jsonOrder.put("createTime", userOrder.getCreateTime());
+            jsonOrder.put("createTime", format.format(userOrder.getCreateTime()));
             jsonOrder.put("username", userOrder.getUser().getUsername());
             jsonOrder.put("totalPrice", userOrder.getTotalPrice());
 

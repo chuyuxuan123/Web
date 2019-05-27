@@ -19,12 +19,29 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    public Book getBookById(Long bookId) {
+        return bookDao.findByBookId(bookId);
+    }
+
+    @Override
     public Book getBookByISBN(String ISBN) {
         return bookDao.findByIsbn(ISBN);
     }
 
     @Override
-    public Integer addABook() {
+    public Integer addABook(Book book) {
+
+        bookDao.save(book);
         return 200;
+    }
+
+    @Override
+    public void deleteBook(Long bookId) {
+        bookDao.deleteBook(bookId);
+    }
+
+    @Override
+    public void modifyBook(Book book) {
+        bookDao.save(book);
     }
 }

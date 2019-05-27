@@ -12,7 +12,7 @@ public interface OrderService {
 
     List<JSONObject> getUserAllOrders(User user);
 
-    List<JSONObject> getOrdersByDateAndUsername(Date begin, Date end, String bookname);
+    List<JSONObject> getOrdersByDateAndUsername(Date begin, Date end, String username);
 
     Integer createOrder(JSONArray items, User user);
 }

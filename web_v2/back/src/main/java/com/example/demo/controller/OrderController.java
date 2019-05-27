@@ -1,21 +1,26 @@
 package com.example.demo.controller;
 
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.example.demo.model.*;
 
+import com.example.demo.repository.OrderRepository;
 import com.example.demo.service.OrderService;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-@Controller
+@RestController
 @CrossOrigin("http://localhost:3000")
 @RequestMapping("/orders")
 public class OrderController {
@@ -23,6 +28,9 @@ public class OrderController {
 
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private OrderRepository orderRepository;
 
     @GetMapping(value = "/all", produces = "application/json;charset=UTF-8")
     public @ResponseBody
@@ -36,20 +44,54 @@ public class OrderController {
     public @ResponseBody
     List<JSONObject> getOrdersByDateAndUsername(@RequestParam("start") String begin,
                                                 @RequestParam("end") String end,
-                                                @RequestParam("bookname") String bookname,
+                                                @RequestParam("username") String username,
                                                 HttpSession session) {
         User user = (User) session.getAttribute("user");
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         try {
             Date startDate = format.parse(begin + " 00:00:00");
             Date endDate = format.parse(end + " 00:00:00");
-
-            return orderService.getOrdersByDateAndUsername(startDate, endDate, bookname);
+            if (user.isAdmin()) {
+                return orderService.getOrdersByDateAndUsername(startDate, endDate, username);
+            }
+            return orderService.getOrdersByDateAndUsername(startDate, endDate, user.getUsername());
 
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    //books sale
+    @GetMapping("/sales")
+    public @ResponseBody
+    List<JSONObject> getBookSales() {
+        List<JSONObject> jsonObjects = new ArrayList<>();
+        for (Object o : orderRepository.getBookSale()
+        ) {
+            Object[] rowArray = (Object[]) o;
+            JSONObject object = new JSONObject();
+            object.put("bookId", ((BigInteger) rowArray[0]).longValue());
+            object.put("bookName", (String) rowArray[1]);
+            object.put("sales", ((BigDecimal) rowArray[2]).intValue());
+            jsonObjects.add(object);
+        }
+        return jsonObjects;
+    }
+
+    @GetMapping("/pay")
+    public List<JSONObject> getUserPay() {
+        List<JSONObject> jsonObjects = new ArrayList<>();
+        for (Object o : orderRepository.getUserPay()
+        ) {
+            Object[] rowArray = (Object[]) o;
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("user_id", rowArray[0]);
+            jsonObject.put("username", rowArray[1]);
+            jsonObject.put("pay", rowArray[2]);
+            jsonObjects.add(jsonObject);
+        }
+        return jsonObjects;
     }
 
 

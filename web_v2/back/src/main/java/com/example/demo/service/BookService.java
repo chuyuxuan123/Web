@@ -8,8 +8,13 @@ public interface BookService {
 
     Iterable<Book> getAllBooks();
 
-    Book getBookByISBN(@RequestParam String ISBN);
+    Book getBookById(Long bookId);
 
-    Integer addABook();
+    Book getBookByISBN(String ISBN);
 
+    Integer addABook(Book book);
+
+    void deleteBook(Long bookId);
+
+    void modifyBook(Book book);
 }
