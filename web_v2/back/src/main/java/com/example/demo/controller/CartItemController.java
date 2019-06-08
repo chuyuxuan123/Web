@@ -1,9 +1,9 @@
 package com.example.demo.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.example.demo.model.Cart;
 import com.example.demo.model.CartItem;
 import com.example.demo.model.User;
-import org.json.JSONObject;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,7 +30,7 @@ public class CartItemController {
     //TODO:考虑把一件商品添加到购物车中时，商品的价格会不会改变
     @PostMapping("/add")
     public @ResponseBody
-    Integer addCartItem(@RequestBody String data, HttpSession session) {
+    Integer addCartItem(@RequestBody JSONObject data, HttpSession session) {
 //        System.out.println(session.getId());
         User user = (User) session.getAttribute("user");
         JSONObject jsonObject = new JSONObject(data);
@@ -41,9 +41,10 @@ public class CartItemController {
 
         Cart cart = (Cart) session.getAttribute("cart");
         CartItem cartItem = new CartItem();
+        cartItem.setBookId(jsonObject.getInteger("bookId"));
         cartItem.setBookname(jsonObject.getString("bookname"));
-        cartItem.setAmount(jsonObject.getInt("amount"));
-        cartItem.setPrice(jsonObject.getInt("price"));
+        cartItem.setAmount(jsonObject.getInteger("amount"));
+        cartItem.setPrice(jsonObject.getInteger("price"));
         cart.add(cartItem);
 
         return 200;
@@ -51,11 +52,11 @@ public class CartItemController {
 
     @GetMapping("/remove")
     public @ResponseBody
-    String removeCartItem(@RequestParam("bookname") String bookname, HttpSession session) {
+    String removeCartItem(@RequestParam("bookId") Integer bookId, HttpSession session) {
 //        System.out.println(bookname);
         User user = (User) session.getAttribute("user");
         Cart cart = (Cart) session.getAttribute("cart");
-        cart.removeByBookname(bookname);
+        cart.removeByBookId(bookId);
 
         return "200";
 

@@ -57,12 +57,18 @@ export default class Navbar extends Component {
                         </Link>
                     </Menu.Item>
                     <Menu.Item key="4">
+                        <Link to="/statistic">
+                            <Icon type="pie-chart" />
+                            <span>统计数据</span>
+                        </Link>
+                    </Menu.Item>
+                    <Menu.Item key="5">
                         <Link to="/settings">
                             <Icon type="setting" />
                             <span>设置</span>
                         </Link>
                     </Menu.Item>
-                    <Menu.Item key="5" onClick={this.props.handleLogout} >
+                    <Menu.Item key="6" onClick={this.props.handleLogout} >
                         <Icon type="logout" />
                         <span>注销</span>
                     </Menu.Item>

@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 
 import {
-    Button, Modal, Form, Input, Upload, Icon
+    Button, Modal, Form, Input, Upload, Icon, message
 } from 'antd';
+import Axios from 'axios';
 
 const ModifyBookCreateForm = Form.create({ name: 'form_in_modal' })(
     // eslint-disable-next-line
@@ -50,6 +51,13 @@ const ModifyBookCreateForm = Form.create({ name: 'form_in_modal' })(
                                 <Input />
                             )}
                         </Form.Item>
+                        <Form.Item label="单价">
+                            {getFieldDecorator('price', {
+                                rules: [{ required: true, message: "请输入单价" }],
+                            })(
+                                <Input />
+                            )}
+                        </Form.Item>
                         {/* <Form.Item label="封面">
               
               <Upload>
@@ -79,6 +87,7 @@ class ModifyBookForm extends Component {
             author: this.props.item.author,
             ISBN: this.props.item.ISBN,
             inventory: this.props.item.inventory,
+            price:this.props.item.price,
         })
     }
 
@@ -93,12 +102,19 @@ class ModifyBookForm extends Component {
             if (err) {
                 return;
             }
-            this.props.handleModify(this.props.item,values);
+            values["bookId"] = this.props.item.key;
             console.log('Received values of form: ', values);
+
+            Axios.put("http://localhost:8080/books",values).then((response)=>{
+                console.log(response);
+                this.props.handleModify(this.props.item, values);
+                message.info("修改成功");
+            })
+            
             form.resetFields();
             this.setState({ visible: false });
         });
-        
+
     }
 
     saveFormRef = (formRef) => {
@@ -108,8 +124,6 @@ class ModifyBookForm extends Component {
     render() {
         return (
             <span>
-                {/* <Button type="primary" onClick={this.showModal}>New Collection</Button> */}
-                {/* <Button type="primary" onClick={this.showModal} size="large" shape="circle" icon="plus" ></Button> */}
                 <a onClick={this.showModal} >修改</a>
                 <ModifyBookCreateForm
                     wrappedComponentRef={this.saveFormRef}

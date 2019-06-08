@@ -1,213 +1,60 @@
 package com.example.demo.controller;
 
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.example.demo.model.*;
-import com.example.demo.repository.BookRepository;
-import com.example.demo.repository.OrderItemRepository;
+
 import com.example.demo.repository.OrderRepository;
-import com.example.demo.repository.UserRepository;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import com.example.demo.service.OrderService;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-@Controller
+@RestController
 @CrossOrigin("http://localhost:3000")
 @RequestMapping("/orders")
 public class OrderController {
 
+
+    @Autowired
+    private OrderService orderService;
+
     @Autowired
     private OrderRepository orderRepository;
 
-    @Autowired
-    private OrderItemRepository orderItemRepository;
-
-    @Autowired
-    private BookRepository bookRepository;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    // get order information begin
-
-    @GetMapping("/allItems")
-    public @ResponseBody
-    Iterable<OrderItem> getAllOrderItems() {
-        return orderItemRepository.findAll();
-    }
-
     @GetMapping(value = "/all", produces = "application/json;charset=UTF-8")
     public @ResponseBody
-    String getUserAllOrders(HttpSession session) {
+    List<JSONObject> getUserAllOrders(HttpSession session) {
 
         User user = (User) session.getAttribute("user");
-        if (user.isAdmin()) {
-            Iterable<UserOrder> userOrders = orderRepository.findAll();
-            ArrayList<JSONObject> returnToFront = new ArrayList<JSONObject>();
-
-
-            Iterator<UserOrder> iterator = userOrders.iterator();
-            while (iterator.hasNext()) {
-                UserOrder userOrder = iterator.next();
-                List<OrderItem> orderItems = userOrder.getOrderItems();
-
-                JSONObject jsonOrder = new JSONObject();
-                jsonOrder.put("key", userOrder.getOrderId());
-                jsonOrder.put("orderId", userOrder.getOrderId());
-                jsonOrder.put("createTime", userOrder.getCreateTime());
-                jsonOrder.put("username", userOrder.getUser().getUsername());
-                jsonOrder.put("totalPrice", userOrder.getTotalPrice());
-
-                ArrayList<JSONObject> jsonOrderItems = new ArrayList<>();
-
-                for (int j = 0; j < orderItems.size(); j++) {
-                    OrderItem orderItem = orderItems.get(j);
-
-                    JSONObject jsonObject = new JSONObject();
-
-                    jsonObject.put("bookname", orderItem.getBook().getBookname());
-                    jsonObject.put("amount", orderItem.getAmount());
-                    jsonObject.put("price", orderItem.getPrice());
-                    jsonObject.put("isbn", orderItem.getBook().getIsbn());
-
-                    jsonOrderItems.add(jsonObject);
-                }
-                jsonOrder.put("detail", jsonOrderItems);
-                returnToFront.add(jsonOrder);
-
-            }
-            Collections.reverse(returnToFront);
-            return returnToFront.toString();
-
-        } else {
-
-            List<UserOrder> userOrders = orderRepository.findByUser_Username(user.getUsername());
-            ArrayList<JSONObject> returnToFront = new ArrayList<>();
-
-            for (int i = 0; i < userOrders.size(); i++) {
-                UserOrder userOrder = userOrders.get(i);
-                List<OrderItem> orderItems = userOrder.getOrderItems();
-
-                JSONObject jsonOrder = new JSONObject();
-                jsonOrder.put("key", userOrder.getOrderId());
-                jsonOrder.put("orderId", userOrder.getOrderId());
-                jsonOrder.put("createTime", userOrder.getCreateTime());
-                jsonOrder.put("username", userOrder.getUser().getUsername());
-                jsonOrder.put("totalPrice", userOrder.getTotalPrice());
-
-                ArrayList<JSONObject> jsonOrderItems = new ArrayList<>();
-
-                for (int j = 0; j < orderItems.size(); j++) {
-                    OrderItem orderItem = orderItems.get(j);
-
-                    JSONObject jsonObject = new JSONObject();
-
-                    jsonObject.put("bookname", orderItem.getBook().getBookname());
-                    jsonObject.put("amount", orderItem.getAmount());
-                    jsonObject.put("price", orderItem.getPrice());
-                    jsonObject.put("isbn", orderItem.getBook().getIsbn());
-
-                    jsonOrderItems.add(jsonObject);
-                }
-                jsonOrder.put("detail", jsonOrderItems);
-                returnToFront.add(jsonOrder);
-
-            }
-            Collections.reverse(returnToFront);
-            return returnToFront.toString();
-        }
+        return orderService.getUserAllOrders(user);
     }
-
-//    @GetMapping(value= "/testget",produces = "application/json;charset=UTF-8")
-//    public @ResponseBody
-//    String test() {
-//
-//        List<UserOrder> userOrders = orderRepository.findByUser_Username("t3");
-//        ArrayList<JSONObject> returnToFront = new ArrayList<>();
-//
-//        for (int i = 0; i < userOrders.size(); i++) {
-//            UserOrder userOrder = userOrders.get(i);
-//            List<OrderItem> orderItems = userOrder.getOrderItems();
-//
-//            JSONObject jsonOrder = new JSONObject();
-//            jsonOrder.put("key", userOrder.getOrderId());
-//            jsonOrder.put("orderId", userOrder.getOrderId());
-//            jsonOrder.put("createTime", userOrder.getCreateTime());
-//            jsonOrder.put("username", userOrder.getUser().getUsername());
-//            jsonOrder.put("totalPrice",userOrder.getTotalPrice());
-//
-//            ArrayList<JSONObject> jsonOrderItems = new ArrayList<>();
-//
-//            for (int j = 0; j < orderItems.size(); j++) {
-//                OrderItem orderItem = orderItems.get(j);
-//
-//                JSONObject jsonObject = new JSONObject();
-//
-//                jsonObject.put("bookname", orderItem.getBook().getBookname());
-//                jsonObject.put("amount", orderItem.getAmount());
-//                jsonObject.put("price",orderItem.getPrice());
-//                jsonObject.put("isbn", orderItem.getBook().getIsbn());
-//
-//                jsonOrderItems.add(jsonObject);
-//            }
-//            jsonOrder.put("detail",jsonOrderItems);
-//            returnToFront.add(jsonOrder);
-//
-//        }
-//        return returnToFront.toString();
-//    }
 
     @GetMapping("/search")
     public @ResponseBody
-    String getOrdersByDateAndUsername(@RequestParam("start") String begin,
-                                      @RequestParam("end") String end,
-                                      @RequestParam("bookname") String bookname,
-                                      HttpSession session) {
+    List<JSONObject> getOrdersByDateAndUsername(@RequestParam("start") String begin,
+                                                @RequestParam("end") String end,
+                                                @RequestParam("username") String username,
+                                                HttpSession session) {
         User user = (User) session.getAttribute("user");
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         try {
             Date startDate = format.parse(begin + " 00:00:00");
             Date endDate = format.parse(end + " 00:00:00");
-
-            List<UserOrder> userOrders = orderRepository.findByCreateTimeBetweenAndUser_Username(startDate, endDate, user.getUsername());
-            ArrayList<JSONObject> returnToFront = new ArrayList<>();
-
-            for (int i = 0; i < userOrders.size(); i++) {
-                UserOrder userOrder = userOrders.get(i);
-                List<OrderItem> orderItems = userOrder.getOrderItems();
-
-                JSONObject jsonOrder = new JSONObject();
-                jsonOrder.put("key", userOrder.getOrderId());
-                jsonOrder.put("orderId", userOrder.getOrderId());
-                jsonOrder.put("createTime", userOrder.getCreateTime());
-                jsonOrder.put("username", userOrder.getUser().getUsername());
-                jsonOrder.put("totalPrice", userOrder.getTotalPrice());
-
-                ArrayList<JSONObject> jsonOrderItems = new ArrayList<>();
-
-                for (int j = 0; j < orderItems.size(); j++) {
-                    OrderItem orderItem = orderItems.get(j);
-
-                    JSONObject jsonObject = new JSONObject();
-
-                    jsonObject.put("bookname", orderItem.getBook().getBookname());
-                    jsonObject.put("amount", orderItem.getAmount());
-                    jsonObject.put("price", orderItem.getPrice());
-                    jsonObject.put("isbn", orderItem.getBook().getIsbn());
-
-                    jsonOrderItems.add(jsonObject);
-                }
-                jsonOrder.put("detail", jsonOrderItems);
-                returnToFront.add(jsonOrder);
-
+            if (user.isAdmin()) {
+                return orderService.getOrdersByDateAndUsername(startDate, endDate, username);
             }
-            return returnToFront.toString();
+            return orderService.getOrdersByDateAndUsername(startDate, endDate, user.getUsername());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -215,8 +62,39 @@ public class OrderController {
         return null;
     }
 
+    //books sale
+    @GetMapping("/sales")
+    public @ResponseBody
+    List<JSONObject> getBookSales() {
+        List<JSONObject> jsonObjects = new ArrayList<>();
+        for (Object o : orderRepository.getBookSale()
+        ) {
+            Object[] rowArray = (Object[]) o;
+            JSONObject object = new JSONObject();
+            object.put("bookId", ((BigInteger) rowArray[0]).longValue());
+            object.put("bookName", (String) rowArray[1]);
+            object.put("sales", ((BigDecimal) rowArray[2]).intValue());
+            jsonObjects.add(object);
+        }
+        return jsonObjects;
+    }
 
-    // get order information end
+    @GetMapping("/pay")
+    public List<JSONObject> getUserPay() {
+        List<JSONObject> jsonObjects = new ArrayList<>();
+        for (Object o : orderRepository.getUserPay()
+        ) {
+            Object[] rowArray = (Object[]) o;
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("user_id", rowArray[0]);
+            jsonObject.put("username", rowArray[1]);
+            jsonObject.put("pay", rowArray[2]);
+            jsonObjects.add(jsonObject);
+        }
+        return jsonObjects;
+    }
+
+
 
     // post method begin
 
@@ -224,81 +102,32 @@ public class OrderController {
     @PostMapping(value = "/buy")
     @Transactional(rollbackFor = Exception.class)
     public @ResponseBody
-    Integer addOrder(@RequestBody String data,
+    Integer addOrder(@RequestBody JSONArray data,
                      HttpSession session) {
-//        System.out.println(data);
+
         User user = (User) session.getAttribute("user");
+        if (orderService.createOrder(data, user) == 200)
+            return 200;
 
-        JSONObject jsonObject = new JSONObject(data);
-        Book book = bookRepository.findByBookname(jsonObject.get("bookname").toString());
-
-        UserOrder userOrder = new UserOrder();
-        userOrder.setUser(userRepository.getByUsername(user.getUsername()));
-
-        OrderItem orderItem = new OrderItem();
-        orderItem.setUserOrder(userOrder);
-        orderItem.setBook(book);
-        orderItem.setAmount(jsonObject.getInt("amount"));
-        orderItem.setPrice(jsonObject.getInt("price"));
-
-        Integer totalPrice = jsonObject.getInt("amount") * jsonObject.getInt("price");
-        userOrder.setTotalPrice(totalPrice);
-
-        Date date = new Date();
-        userOrder.setCreateTime(date);
-        orderRepository.save(userOrder);
-        orderItemRepository.save(orderItem);
-        book.setInventory(book.getInventory() - jsonObject.getInt("amount"));
-        bookRepository.save(book);
-        return 200;
+        return 400;
     }
 
     //TODO:只能一次处理所有的订单，并且出错之后无法撤销
     @PostMapping("/cart/buy")
     @Transactional(rollbackFor = Exception.class)
     public @ResponseBody
-    Integer buySome(HttpSession session,@RequestBody String items){
-        System.out.println(items);
+    Integer buySome(HttpSession session, @RequestBody JSONArray items) {
+
         JSONArray jsonItems = new JSONArray(items);
-        System.out.println(jsonItems);
 
         User user = (User) session.getAttribute("user");
-        UserOrder userOrder = new UserOrder();
-        userOrder.setUser(user);
-        List<OrderItem> orderItems = new ArrayList<>();
-        userOrder.setOrderItems(orderItems);
 
-        Integer totalPrice = 0;
         for (Object item:jsonItems
              ) {
-            OrderItem orderItem = new OrderItem();
-            Book book = bookRepository.findByBookname(((JSONObject)item).getString("bookname"));
-
-            orderItem.setUserOrder(userOrder);
-            orderItem.setPrice(book.getPrice());
-            orderItem.setAmount(((JSONObject)item).getInt("amount"));
-            orderItem.setBook(book);
-
-            book.setInventory(book.getInventory() - ((JSONObject)item).getInt("amount"));
-            bookRepository.save(book);
-
-            orderItems.add(orderItem);
-
-            totalPrice = totalPrice + ((JSONObject)item).getInt("amount")*book.getPrice();
-
-            ((Cart)session.getAttribute("cart")).removeByBookname(((JSONObject)item).getString("bookname"));
-        }
-        userOrder.setTotalPrice(totalPrice);
-        userOrder.setOrderItems(orderItems);
-        for (OrderItem orderItem : orderItems
-        ) {
-            orderItemRepository.save(orderItem);
+            ((Cart) session.getAttribute("cart")).removeByBookId((Integer) ((LinkedHashMap) item).get("bookId"));
         }
 
-        orderRepository.save(userOrder);
-
-
-        return 200;
+        return orderService.createOrder(items, user);
     }
 
 

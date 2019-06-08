@@ -14,6 +14,7 @@ import BookDetail from './BookDetail';
 import Cart from './Cart';
 // import Orders from './Orders';
 import AOrder from './AOrder';
+import Statistic from './Statistic';
 
 import Axios from 'axios';
 import { message } from 'antd';
@@ -158,6 +159,7 @@ class App extends Component {
                     <Route exact path="/booklist" render={props => <Booklist isAdmin={this.state.isAdmin} />} />
                     <Route exact path="/account" render={props => <AccountManage />} />
                     <Route exact path="/orders" render={props => <AOrder isAdmin={this.state.isAdmin} />} />
+                    <Route exact path="/statistic" render={props => <Statistic /> } />
                     <Route exact path="/settings" />
                     <Route render={props => <Redirect to="/booklist" />} />
                   </Switch>

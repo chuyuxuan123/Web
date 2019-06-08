@@ -3,6 +3,7 @@ package com.example.demo.controller;
 
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -15,41 +16,37 @@ import javax.servlet.http.HttpSession;
 @RequestMapping("/users")
 public class UserController {
 
+
+    private UserService userService;
+
     @Autowired
-    private UserRepository userRepository;
+    public UserController(UserService service) {
+        this.userService = service;
+    }
 
     @GetMapping("/all")
     public @ResponseBody
     Iterable<User> getAllUsers() {
-        return userRepository.findAll();
+        return userService.getAllUsers();
     }
 
     @GetMapping("/auth")
     @ResponseBody
     public String updateEnableByUsername(@RequestParam("user") String username, @RequestParam("enable") String enable) {
         if (enable.equals("false")) {
-            userRepository.updateEnableByUsername(username, false);
+            userService.updateEnableByUsername(username, false);
         } else {
-            userRepository.updateEnableByUsername(username, true);
+            userService.updateEnableByUsername(username, true);
         }
         return "updated";
     }
 
     @GetMapping("/registration")
     @ResponseBody
-    public String addNewUser(@RequestParam("username") String username, @RequestParam("email") String email, @RequestParam("password") String password) {
-        if (userRepository.getByUsername(username) != null) {
-            return "duplicate";
-        }
-
-        User user = new User();
-        user.setAdmin(false);
-        user.setUsername(username);
-        user.setEmail(email);
-        user.setPassword(password);
-        user.setEnable(true);
-        userRepository.save(user);
-        return "saved";
+    public String addNewUser(@RequestParam("username") String username,
+                             @RequestParam("email") String email,
+                             @RequestParam("password") String password) {
+        return userService.addNewUser(username, email, password);
     }
 
     @GetMapping("/sign")
@@ -58,14 +55,8 @@ public class UserController {
                                @RequestParam("password") String password,
                                HttpSession session) {
 
-//        Cookie[] cookies = request.getCookies();
-//        if (cookies != null && cookies.length > 0) {
-//            for (Cookie cookie : cookies) {
-//                System.out.println(cookie.getName() + " : " + cookie.getValue());
-//            }
-//        }
 
-        User user = userRepository.getByUsername(username);
+        User user = userService.getByUsername(username);
         if (user.getPassword().equals(password)) {
             if (user.isAdmin()) {
 

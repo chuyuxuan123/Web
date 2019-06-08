@@ -1,53 +1,75 @@
 package com.example.demo.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.example.demo.model.Book;
-import com.example.demo.repository.BookRepository;
+import com.example.demo.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpSession;
 
 
 @Controller
 @CrossOrigin("http://localhost:3000")
 @RequestMapping(path = "/books")
 public class BookController {
-    @Autowired
 
-    private BookRepository bookRepository;
+    private BookService bookService;
+
+    @Autowired
+    public BookController(BookService service) {
+        this.bookService = service;
+    }
 
     @GetMapping(path = "/all")
     public @ResponseBody
     Iterable<Book> getAllBooks() {
-        return bookRepository.findAll();
+        return bookService.getAllBooks();
     }
 
     @GetMapping(path = "/get")
     public @ResponseBody
-    Book getBookByISBN(@RequestParam String ISBN,
-                       HttpSession session) {
-//        System.out.println(session.getAttribute("user"));
-        return bookRepository.findByIsbn(ISBN);
+    Book getBookByISBN(@RequestParam String ISBN) {
+        return bookService.getBookByISBN(ISBN);
     }
 
-//    @GetMapping(path = "/add")
-//    public @ResponseBody
-//    String addBook(@RequestParam String ISBN,
-//                   @RequestParam String bookname,
-//                   @RequestParam String author,
-//                   @RequestParam String cover,
-//                   @RequestParam Integer inventory,
-//                   @RequestParam Integer price) {
-//        Book book = new Book();
-//        book.setISBN(ISBN);
-//        book.setBookname(bookname);
-//        book.setAuthor(author);
-//        book.setCover(cover);
-//        book.setInventory(inventory);
-//        book.setPrice(price);
-//
-//        bookRepository.save(book);
-//        return "saved";
-//    }
+
+    @PostMapping(path = "/add")
+    public @ResponseBody
+    String addBook(@RequestBody JSONObject data) {
+
+        System.out.println(data);
+        Book book = new Book();
+        book.setIsbn(data.getString("isbn"));
+        book.setBookname(data.getString("bookname"));
+        book.setAuthor(data.getString("author"));
+        book.setCover("/" + data.getString("cover"));
+        book.setInventory(data.getInteger("inventory"));
+        book.setPrice(data.getInteger("price"));
+        System.out.println(book);
+
+        bookService.addABook(book);
+
+
+        return "saved";
+    }
+
+    @DeleteMapping
+    public @ResponseBody
+    String deleteBook(@RequestParam(value = "bookId") Long bookId) {
+        bookService.deleteBook(bookId);
+        return "deleted";
+    }
+
+    @PutMapping
+    public @ResponseBody
+    String modifyBookInfo(@RequestBody JSONObject data) {
+        Book book = bookService.getBookById(data.getLong("bookId"));
+        book.setIsbn(data.getString("ISBN"));
+        book.setBookname(data.getString("bookname"));
+        book.setAuthor(data.getString("author"));
+        book.setInventory(data.getInteger("inventory"));
+        book.setPrice(data.getInteger("price"));
+        bookService.modifyBook(book);
+        return "saved";
+    }
 }

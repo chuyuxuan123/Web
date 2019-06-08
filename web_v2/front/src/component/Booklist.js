@@ -98,7 +98,7 @@ export default class Booklist extends Component {
                 var n = new Array();
                 for (var i in d) {
                     var t = d[i];
-                    n.push({"key":t.bookId,"bookname":t.bookname,"author":t.author,"ISBN":t.isbn,"inventory":t.inventory,"cover":t.cover});
+                    n.push({"key":t.bookId,"bookname":t.bookname,"author":t.author,"ISBN":t.isbn,"inventory":t.inventory, "price":t.price, "cover":t.cover});
                 }
 
                 this.setState({loading:false,dataSource:n});
@@ -169,21 +169,21 @@ export default class Booklist extends Component {
     }
 
     handleCreate = (n) => {
-        const dataSource = [...this.state.dataSource];
-        let newItem = {
-            key: GLOBALKEY,
-            bookname: n.bookname,
-            author: n.author,
-            ISBN: n.ISBN,
-            inventory: n.inventory,
-            cover: null,
-        };
-        dataSource.push(newItem);
+        // const dataSource = [...this.state.dataSource];
+        // let newItem = {
+        //     key: GLOBALKEY,
+        //     bookname: n.bookname,
+        //     author: n.author,
+        //     ISBN: n.isbn,
+        //     inventory: n.inventory,
+        //     cover: null,
+        // };
+        // dataSource.push(newItem);
 
-        this.setState({
-            dataSource: dataSource,
-        });
-        GLOBALKEY++;
+        // this.setState({
+        //     dataSource: dataSource,
+        // });
+        // GLOBALKEY++;
     }
 
     handleModify = (item, modified) => {
@@ -196,6 +196,7 @@ export default class Booklist extends Component {
                 dataSource[i].author = modified.author;
                 dataSource[i].ISBN = modified.ISBN;
                 dataSource[i].inventory = modified.inventory;
+                dataSource[i].price = modified.price;
             }
         }
 
@@ -206,6 +207,11 @@ export default class Booklist extends Component {
         const dataSource = [...this.state.dataSource];
         let key = item.key;
         this.setState({ dataSource: dataSource.filter(item => item.key !== key) });
+        Axios.delete("http://localhost:8080/books",{
+            params:{bookId:item.key}
+        }).then((response)=>{
+            console.log(response);
+        })
     }
 
     render() {
@@ -239,6 +245,10 @@ export default class Booklist extends Component {
             title: '库存量',
             dataIndex: 'inventory',
             key: 'inventory'
+        }, {
+            title: '单价',
+            dataIndex: 'price',
+            key: 'price'
         }, {
             title: '操作',
             key: 'action',

@@ -64,7 +64,7 @@ export default class Cart extends Component {
         var n = new Array();
         for (let index = 0; index < d.length; index++) {
           const element = d[index];
-          n.push({ "key": index, "bookname": element.bookname, "price": element.price, "amount": element.amount })
+          n.push({ "key": element.bookId, "bookname": element.bookname, "price": element.price, "amount": element.amount })
         }
         this.setState({ dataSource: n });
       })
@@ -108,12 +108,12 @@ export default class Cart extends Component {
     // console.log(item);
     Axios.get("http://localhost:8080/cartItems/remove", {
       params: {
-        bookname: item.bookname,
+        bookId: item.key,
       }
     }).then((response) => {
       let oldData = [...this.state.dataSource];
       for (let index = 0; index < oldData.length; index++) {
-        if (oldData[index].bookname == item.bookname) {
+        if (oldData[index].bookId == item.bookId) {
           oldData.splice(index, 1);
         }
       }
@@ -133,7 +133,7 @@ export default class Cart extends Component {
     var data = new Array();
     for (let index = 0; index < rawList.length; index++) {
       const element = rawList[index];
-      data.push({ "bookname": element.bookname, "amount": element.amount });
+      data.push({ "bookId": element.key, "amount": element.amount });
     }
 
     
@@ -144,9 +144,11 @@ export default class Cart extends Component {
       if (response.data == 200) {
         message.info("购买成功");
         let oldData = [...this.state.dataSource];
+        // console.log(oldData);
+        // console.log(data);
         for (let index = 0; index < oldData.length; index++) {
           for (let j = 0; j < data.length; j++) {
-            if (oldData[index].bookname == data[j].bookname) {
+            if (oldData[index].key == data[j].bookId) {
               oldData.splice(index, 1);
             }            
           }

@@ -1,22 +1,54 @@
 import React, { Component } from 'react';
 
 import {
-  Button, Modal, Form, Input, Upload, Icon
+  Button, Modal, Form, Input, Upload, Icon, message
 } from 'antd';
+import Axios from 'axios';
 
 const NewBookCreateForm = Form.create({ name: 'form_in_modal' })(
   // eslint-disable-next-line
   class extends Component {
+    constructor(props) {
+      super(props);
+      this.state = {
+        loading:false,
+        file: '',
+      }
+    }
+
     render() {
       const {
         visible, onCancel, onCreate, form,
       } = this.props;
+
       const { getFieldDecorator } = form;
+
+      const uploadProps = {
+        action: 'http://localhost:8080/image/upload',
+        onChange(info) {
+          if (info.file.status !== 'uploading') {
+            console.log(info.file, info.fileList);
+          }
+          if (info.file.status === 'done') {
+            message.success(`${info.file.name} file uploaded successfully`);
+          } else if (info.file.status === 'error') {
+            message.error(`${info.file.name} file upload failed.`);
+          }
+        },
+        // beforeUpload: file => {
+        //   this.setState(state => ({
+        //     file: [...state.file, file],
+        //   }));
+        //   return false;
+        // }
+      }
       return (
         <Modal
           visible={visible}
-          title="Create a new book"
-          okText="Create"
+          title="创建一个书目"
+          okText="新建"
+          cancelText="取消"
+          loading={this.state.loading}
           onCancel={onCancel}
           onOk={onCreate}
         >
@@ -36,7 +68,7 @@ const NewBookCreateForm = Form.create({ name: 'form_in_modal' })(
               )}
             </Form.Item>
             <Form.Item label="ISBN">
-              {getFieldDecorator('ISBN', {
+              {getFieldDecorator('isbn', {
                 rules: [{ required: true, message: "请输入书的ISBN编号" }],
               })(
                 <Input />
@@ -49,14 +81,25 @@ const NewBookCreateForm = Form.create({ name: 'form_in_modal' })(
                 <Input />
               )}
             </Form.Item>
+
+            <Form.Item label="单价">
+              {getFieldDecorator('price', {
+                rules: [{ required: true, message: "请输入单价" }],
+              })(
+                <Input />
+              )}
+            </Form.Item>
+
             <Form.Item label="封面">
-              
-              <Upload>
-                <Button>
-                  <Icon type="upload" /> 点击上传封面
-                </Button>
-              </Upload>
-              
+              {getFieldDecorator('file', {
+                rules: [{ required: true, message: "请上传封面" }],
+              })(
+                <Upload {...uploadProps}>
+                  <Button>
+                    <Icon type="upload" /> 点击上传封面
+                    </Button>
+                </Upload>
+              )}
             </Form.Item>
           </Form>
         </Modal>
@@ -70,7 +113,7 @@ class NewBookForm extends Component {
     visible: false,
   };
 
-  showModal = () => {    
+  showModal = () => {
     this.setState({ visible: true });
   }
 
@@ -84,9 +127,18 @@ class NewBookForm extends Component {
       if (err) {
         return;
       }
-
-      this.props.handleCreate(values);
+      this.setState({loading:true})
+      
+      values["cover"] = values.file.file.name;
       console.log('Received values of form: ', values);
+      
+      Axios.post("http://localhost:8080/books/add", values).then(response => {
+        this.setState({loading:false})
+        console.log(response);
+        this.props.handleCreate(values);
+        message.info("添加成功");
+      });
+      
       form.resetFields();
       this.setState({ visible: false });
     });
