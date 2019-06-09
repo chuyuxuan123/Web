@@ -7,9 +7,12 @@
 
 #cover{
     float: left;
+    margin-right: 50px;
 }
 #info{
-    float: left;
+    /* float: left; */
+    position: relative;
+    min-height: 430px;
     margin: 15px;
     right: 15px;
 }

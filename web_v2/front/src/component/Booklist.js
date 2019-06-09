@@ -262,7 +262,7 @@ export default class Booklist extends Component {
                                 <a>删除</a>
                             </Popconfirm>
                         </div>) :
-                        (<Link to={'/detail/' + item.ISBN} >详细信息</Link>)}
+                        (<Link to={'/detail/' + item.key} >详细信息</Link>)}
                 </span>
             )
         }];

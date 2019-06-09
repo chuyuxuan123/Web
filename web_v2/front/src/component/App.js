@@ -13,6 +13,7 @@ import AccountManage from './AccountManage';
 import BookDetail from './BookDetail';
 import Cart from './Cart';
 // import Orders from './Orders';
+import Settings from './Settings';
 import AOrder from './AOrder';
 import Statistic from './Statistic';
 
@@ -62,27 +63,6 @@ class App extends Component {
   }
   // call setState in componentWillUpdate() will cause infinite loop
   // call componentDidUpdate is inproperty here because each time react component update this function will be invoked
-  // componentDidUpdate(prevState) {
-  //   Axios.get("http://localhost:8080/users/validate")
-  //     .then((response) => {
-  //       if (response.data == 200) {
-  //         if (!prevState.login) {
-  //           this.setState({ login: true });
-  //         }
-  //       } else if (response.data == 202) {
-  //         if (!prevState.login || !prevState.isAdmin) {
-  //           this.setState({ login: true, isAdmin: true });
-  //         }
-  //       } else if (response.data == 401) {
-  //         if (prevState.login) {
-  //           message.info("请先登录");
-  //           this.setState({ login: false, isAdmin: false });
-  //           window.location.href = "/";
-  //         }
-  //       }
-  //     })
-  //     .catch((error) => { })
-  // }
 
   handleLogin = (flag) => {
     if (flag == 1) {             //flag=1 user
@@ -146,8 +126,8 @@ class App extends Component {
                     <Route exact path="/booklist" render={props => <Booklist isAdmin={this.state.isAdmin} />} />
                     <Route exact path="/cart" render={props => <Cart />} />
                     <Route exact path="/orders" render={props => <AOrder isAdmin={this.state.isAdmin} />} />
-                    <Route path="/detail/:isbn" render={props => <BookDetail {...props} username={this.state.username} />} />
-                    <Route exact path="/settings" />
+                    <Route path="/detail/:bookId" render={props => <BookDetail {...props} username={this.state.username} />} />
+                    <Route exact path="/settings" render={props => <Settings {...props} /> } />
                     <Route render={props => <Redirect to="/booklist" />} />
                   </Switch>
                 </div>

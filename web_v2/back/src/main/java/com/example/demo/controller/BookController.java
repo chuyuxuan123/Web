@@ -1,11 +1,15 @@
 package com.example.demo.controller;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.example.demo.model.Book;
+import com.example.demo.model.User;
 import com.example.demo.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpSession;
 
 
 @Controller
@@ -32,6 +36,11 @@ public class BookController {
         return bookService.getBookByISBN(ISBN);
     }
 
+    @GetMapping
+    public @ResponseBody
+    Book getBookById(@RequestParam Long bookId) {
+        return bookService.getBookById(bookId);
+    }
 
     @PostMapping(path = "/add")
     public @ResponseBody
@@ -70,6 +79,22 @@ public class BookController {
         book.setInventory(data.getInteger("inventory"));
         book.setPrice(data.getInteger("price"));
         bookService.modifyBook(book);
+        return "saved";
+    }
+
+    @GetMapping(value = "/{bookId}/comment")
+    public @ResponseBody
+    JSONArray getBookComment(@PathVariable("bookId") Integer bookId) {
+        return bookService.getBookComment(bookId);
+    }
+
+    @PostMapping(value = "/{bookId}/comment")
+    public @ResponseBody
+    String postBookComment(@PathVariable("bookId") Integer bookId, @RequestBody String content, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        System.out.println(content);
+        System.out.println(bookId);
+        bookService.addBookComment(bookId, user.getUsername(), content);
         return "saved";
     }
 }

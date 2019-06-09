@@ -1,6 +1,8 @@
 package com.example.demo.dao;
 
 import com.example.demo.model.User;
+import com.example.demo.model.UserInfo;
+import org.bson.types.Binary;
 
 public interface UserDao {
 
@@ -10,5 +12,9 @@ public interface UserDao {
 
     Iterable<User> findAll();
 
-    void save(User user);
+    void save(User user, UserInfo userInfo);
+
+    void setAvatar(String username, Binary avatar);
+
+    byte[] getUserAvatar(String username);
 }

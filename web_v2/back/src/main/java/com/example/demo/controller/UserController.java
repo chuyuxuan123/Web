@@ -4,12 +4,16 @@ package com.example.demo.controller;
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.UserService;
+import org.bson.types.Binary;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
 
 @Controller
 @CrossOrigin
@@ -107,5 +111,36 @@ public class UserController {
             return 401;
         }
         return 200;
+    }
+
+    @PostMapping(value = "/avatar")
+    public @ResponseBody
+    String updateAvatar(HttpSession session, @RequestParam("avatar") MultipartFile file) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            System.out.println("login first");
+        }
+        try {
+            Binary binary = new Binary(file.getBytes());
+            userService.setUserAvatar(user.getUsername(), binary);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "error";
+        }
+        return "update";
+    }
+
+    @GetMapping(value = "/my-avatar", produces = MediaType.IMAGE_JPEG_VALUE)
+    @ResponseBody
+    public byte[] getUserAvatar(HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        return userService.getUserAvatar(user.getUsername());
+    }
+
+    @GetMapping(value = "/avatar", produces = MediaType.IMAGE_JPEG_VALUE)
+    @ResponseBody
+    public byte[] getAvatar(@RequestParam("name") String username) {
+
+        return userService.getUserAvatar(username);
     }
 }

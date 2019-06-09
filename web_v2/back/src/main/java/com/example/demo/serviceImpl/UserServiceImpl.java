@@ -2,7 +2,9 @@ package com.example.demo.serviceImpl;
 
 import com.example.demo.dao.UserDao;
 import com.example.demo.model.User;
+import com.example.demo.model.UserInfo;
 import com.example.demo.service.UserService;
+import org.bson.types.Binary;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -40,7 +42,21 @@ public class UserServiceImpl implements UserService {
         user.setEmail(email);
         user.setPassword(password);
         user.setEnable(true);
-        userDao.save(user);
+        UserInfo userInfo = new UserInfo();
+        userInfo.setUsername(username);
+
+        userDao.save(user, userInfo);
+
         return "saved";
+    }
+
+    @Override
+    public void setUserAvatar(String username, Binary avatar) {
+        userDao.setAvatar(username, avatar);
+    }
+
+    @Override
+    public byte[] getUserAvatar(String username) {
+        return userDao.getUserAvatar(username);
     }
 }
