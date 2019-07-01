@@ -34,4 +34,24 @@ public class OrderDaoImpl implements OrderDao {
     public void save(UserOrder userOrder) {
         orderRepository.save(userOrder);
     }
+
+    @Override
+    public List<Object> getBookSales() {
+        return orderRepository.getBookSales();
+    }
+
+    @Override
+    public List<Object> getUserPay() {
+        return orderRepository.getUserPay();
+    }
+
+    @Override
+    public List<Object> getBookSalesBetween(Date start, Date end) {
+        return orderRepository.getBookSaleBetweenDate(start, end);
+    }
+
+    @Override
+    public List<Object> getUserPayBetween(Date start, Date end) {
+        return orderRepository.getUserPayBetweenDate(start, end);
+    }
 }

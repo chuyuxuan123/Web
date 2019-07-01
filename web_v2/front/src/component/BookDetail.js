@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Card, Statistic, InputNumber, Button, message } from 'antd';
+import { Card, Statistic, InputNumber, Button, message, Modal } from 'antd';
 
 import './BookComment';
 import '../assets/css/bookdetail.css';
@@ -73,14 +73,27 @@ export default class BookDetail extends Component {
       "amount": this.state.amount
     }];
 
-    Axios.post("http://localhost:8080/orders/buy", data, {
+    Axios.post("http://localhost:8080/books/inventory", data, {
       headers: { "Content-Type": "application/json" }
     }).then((response) => {
-      if (response.data == 200) {
-        message.info("购买成功");
-        window.history.go(-1);
+      console.log("validate inventory");
+      console.log(response.data);
+      if (response.data.length !== 0) {
+        Modal.warning({
+          title: '库存不足',
+          content: '您选择的图书' + response.data[0].bookName + ", 目前仅剩" + response.data[0].inventory + "本",
+        });
+      } else {
+        Axios.post("http://localhost:8080/orders/buy", data, {
+          headers: { "Content-Type": "application/json" }
+        }).then((response) => {
+          if (response.data == 200) {
+            message.info("购买成功");
+            window.history.go(-1);
+          }
+        });
       }
-    })
+    });
   }
 
   handleAddToCart = () => {
@@ -137,7 +150,7 @@ export default class BookDetail extends Component {
           </div>
 
         </div>
-        <div style={{ float: "none",width:"70%",paddingLeft:"100px" }} >
+        <div style={{ float: "none", width: "70%", paddingLeft: "100px" }} >
           <BookComment bookId={this.props.match.params.bookId} username={this.props.username} />
         </div>
       </div>

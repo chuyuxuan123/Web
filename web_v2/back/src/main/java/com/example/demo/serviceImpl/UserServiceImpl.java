@@ -8,6 +8,9 @@ import org.bson.types.Binary;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -18,6 +21,19 @@ public class UserServiceImpl implements UserService {
     @Override
     public Iterable<User> getAllUsers() {
         return userDao.findAll();
+    }
+
+    @Override
+    public ArrayList<User> getAllUsersExceptAdmin() {
+        Iterable<User> allUser = userDao.findAll();
+        Iterator<User> it = allUser.iterator();
+        ArrayList<User> allUserExceptAdmin = new ArrayList<>();
+        allUser.forEach(user -> {
+            if (!user.isAdmin()) {
+                allUserExceptAdmin.add(user);
+            }
+        });
+        return allUserExceptAdmin;
     }
 
     @Override
@@ -59,4 +75,5 @@ public class UserServiceImpl implements UserService {
     public byte[] getUserAvatar(String username) {
         return userDao.getUserAvatar(username);
     }
+
 }

@@ -2,7 +2,6 @@ package com.example.demo.controller;
 
 
 import com.example.demo.model.User;
-import com.example.demo.repository.UserRepository;
 import com.example.demo.service.UserService;
 import org.bson.types.Binary;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +10,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.ArrayList;
 
 @Controller
 @CrossOrigin
@@ -30,8 +29,8 @@ public class UserController {
 
     @GetMapping("/all")
     public @ResponseBody
-    Iterable<User> getAllUsers() {
-        return userService.getAllUsers();
+    ArrayList<User> getAllUsers() {
+        return userService.getAllUsersExceptAdmin();
     }
 
     @GetMapping("/auth")
@@ -52,6 +51,7 @@ public class UserController {
                              @RequestParam("password") String password) {
         return userService.addNewUser(username, email, password);
     }
+
 
     @GetMapping("/sign")
     @ResponseBody

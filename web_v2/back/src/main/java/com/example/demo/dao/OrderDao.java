@@ -14,4 +14,12 @@ public interface OrderDao {
     Iterable<UserOrder> findAll();
 
     void save(UserOrder userOrder);
+
+    List<Object> getBookSales();
+
+    List<Object> getUserPay();
+
+    List<Object> getBookSalesBetween(Date start, Date end);
+
+    List<Object> getUserPayBetween(Date start, Date end);
 }

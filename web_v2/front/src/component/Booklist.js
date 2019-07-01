@@ -12,7 +12,6 @@ import '../assets/css/booklist.css';
 import Axios from 'axios';
 import { message } from 'antd';
 
-let GLOBALKEY = 8;
 
 const data = [{
     key: 1,
@@ -169,21 +168,7 @@ export default class Booklist extends Component {
     }
 
     handleCreate = (n) => {
-        // const dataSource = [...this.state.dataSource];
-        // let newItem = {
-        //     key: GLOBALKEY,
-        //     bookname: n.bookname,
-        //     author: n.author,
-        //     ISBN: n.isbn,
-        //     inventory: n.inventory,
-        //     cover: null,
-        // };
-        // dataSource.push(newItem);
-
-        // this.setState({
-        //     dataSource: dataSource,
-        // });
-        // GLOBALKEY++;
+        this.fetch();
     }
 
     handleModify = (item, modified) => {

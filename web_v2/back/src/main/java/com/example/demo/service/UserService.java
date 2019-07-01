@@ -3,6 +3,8 @@ package com.example.demo.service;
 import com.example.demo.model.User;
 import org.bson.types.Binary;
 
+import java.util.ArrayList;
+
 public interface UserService {
 
     Iterable<User> getAllUsers();
@@ -16,4 +18,6 @@ public interface UserService {
     void setUserAvatar(String username, Binary avatar);
 
     byte[] getUserAvatar(String username);
+
+    ArrayList<User> getAllUsersExceptAdmin();
 }

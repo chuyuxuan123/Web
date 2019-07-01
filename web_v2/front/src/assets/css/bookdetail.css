@@ -8,11 +8,12 @@
 #cover{
     float: left;
     margin-right: 50px;
+    max-height: 480px;
 }
 #info{
     /* float: left; */
     position: relative;
-    min-height: 430px;
+    min-height: 470px;
     margin: 15px;
     right: 15px;
 }

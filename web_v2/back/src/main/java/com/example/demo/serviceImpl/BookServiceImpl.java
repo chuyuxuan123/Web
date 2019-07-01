@@ -1,6 +1,7 @@
 package com.example.demo.serviceImpl;
 
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.example.demo.dao.BookDao;
 import com.example.demo.model.Book;
 import com.example.demo.model.BookComment;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 
@@ -61,5 +63,25 @@ public class BookServiceImpl implements BookService {
     @Override
     public void addBookComment(Integer bookId, String username, String content) {
         bookDao.addBookComment(bookId, username, content);
+    }
+
+    @Override
+    public List<JSONObject> validateBookInventory(JSONArray items) {
+
+        List<JSONObject> objectList = new ArrayList<>();
+        for (Object i : items
+        ) {
+            Long bookId = ((Integer) ((LinkedHashMap) i).get("bookId")).longValue();
+            Integer amount = (Integer) ((LinkedHashMap) i).get("amount");
+            Book book = bookDao.findByBookId(bookId);
+            if (amount > book.getInventory()) {
+                JSONObject object = new JSONObject();
+                object.put("bookId", bookId);
+                object.put("bookName", book.getBookname());
+                object.put("inventory", book.getInventory());
+                objectList.add(object);
+            }
+        }
+        return objectList;
     }
 }

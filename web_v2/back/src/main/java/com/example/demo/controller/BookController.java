@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 
 @Controller
@@ -45,8 +46,6 @@ public class BookController {
     @PostMapping(path = "/add")
     public @ResponseBody
     String addBook(@RequestBody JSONObject data) {
-
-        System.out.println(data);
         Book book = new Book();
         book.setIsbn(data.getString("isbn"));
         book.setBookname(data.getString("bookname"));
@@ -57,7 +56,6 @@ public class BookController {
         System.out.println(book);
 
         bookService.addABook(book);
-
 
         return "saved";
     }
@@ -82,6 +80,13 @@ public class BookController {
         return "saved";
     }
 
+    @PostMapping("/inventory")
+    public @ResponseBody
+    List<JSONObject> validateBookInventory(@RequestBody JSONArray data) {
+        JSONArray jsonItems = new JSONArray(data);
+        return bookService.validateBookInventory(data);
+    }
+
     @GetMapping(value = "/{bookId}/comment")
     public @ResponseBody
     JSONArray getBookComment(@PathVariable("bookId") Integer bookId) {
@@ -90,10 +95,9 @@ public class BookController {
 
     @PostMapping(value = "/{bookId}/comment")
     public @ResponseBody
-    String postBookComment(@PathVariable("bookId") Integer bookId, @RequestBody String content, HttpSession session) {
+    String postBookComment(@PathVariable("bookId") Integer bookId, @RequestBody JSONObject data, HttpSession session) {
         User user = (User) session.getAttribute("user");
-        System.out.println(content);
-        System.out.println(bookId);
+        String content = data.getString("comment");
         bookService.addBookComment(bookId, user.getUsername(), content);
         return "saved";
     }

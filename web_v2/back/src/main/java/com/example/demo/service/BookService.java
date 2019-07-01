@@ -1,8 +1,10 @@
 package com.example.demo.service;
 
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.example.demo.model.Book;
-import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
 
 
 public interface BookService {
@@ -22,4 +24,6 @@ public interface BookService {
     JSONArray getBookComment(Integer bookId);
 
     void addBookComment(Integer bookId, String username, String content);
+
+    List<JSONObject> validateBookInventory(JSONArray items);
 }

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import { Table, InputNumber, Statistic, Button, Popconfirm } from 'antd';
+import { Table, InputNumber, Statistic, Button, Popconfirm, Modal } from 'antd';
 
 import '../assets/css/cart.css';
 import Axios from 'axios';
@@ -33,15 +33,15 @@ export default class Cart extends Component {
 
   constructor(props) {
     super(props);
-    Axios.get("http://localhost:8080/users/validate").then((response)=>{
-      if(response.data==401){
+    Axios.get("http://localhost:8080/users/validate").then((response) => {
+      if (response.data == 401) {
         message.warn("登录过期，请重新登录");
-        window.location.href="/";
+        window.location.href = "/";
         return;
       }
-    }).catch((error)=>{
+    }).catch((error) => {
       message.error("网络出错!");
-      window.location.href="/";
+      window.location.href = "/";
     });
     this.state = {
       totalPrice: 0,
@@ -104,22 +104,14 @@ export default class Cart extends Component {
   }
 
   handleRemove = (e, item) => {
-    // console.log(e);
-    // console.log(item);
     Axios.get("http://localhost:8080/cartItems/remove", {
       params: {
         bookId: item.key,
       }
     }).then((response) => {
-      let oldData = [...this.state.dataSource];
-      for (let index = 0; index < oldData.length; index++) {
-        if (oldData[index].bookId == item.bookId) {
-          oldData.splice(index, 1);
-        }
-      }
-      this.setState({ dataSource: oldData });
       if (response.data == "200") {
-
+        // very terrible; needn't call fetch to get data from backend
+        this.fetch();
       }
     }).catch((error) => {
 
@@ -129,52 +121,69 @@ export default class Cart extends Component {
   handlePurchase = () => {
     var rawList = this.state.selectedRows;
 
-    
     var data = new Array();
     for (let index = 0; index < rawList.length; index++) {
       const element = rawList[index];
       data.push({ "bookId": element.key, "amount": element.amount });
     }
 
-    
-
-    Axios.post("http://localhost:8080/orders/cart/buy", data, {
-      'Content-Type': 'application/json',
+    Axios.post("http://localhost:8080/books/inventory", data, {
+      headers: { "Content-Type": "application/json" }
     }).then((response) => {
-      if (response.data == 200) {
-        message.info("购买成功");
-        let oldData = [...this.state.dataSource];
-        // console.log(oldData);
-        // console.log(data);
-        for (let index = 0; index < oldData.length; index++) {
-          for (let j = 0; j < data.length; j++) {
-            if (oldData[index].key == data[j].bookId) {
-              oldData.splice(index, 1);
-            }            
-          }
-        }
-        this.setState({dataSource:oldData,totalPrice:0});
-
-      }
-      console.log(response);
-    }).catch((error)=>{
-      if (error.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
-        console.log(error.response.data);
-        console.log(error.response.status);
-        console.log(error.response.headers);
-      } else if (error.request) {
-        // The request was made but no response was received
-        // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-        // http.ClientRequest in node.js
-        console.log(error.request);
+      console.log("validate inventory");
+      console.log(response.data);
+      if (response.data.length !== 0) {
+        var warningMessage = "";
+        (response.data).forEach(element => {
+          var tmp = "您选择的图书: " + element.bookName + ", 目前仅剩 " + element.inventory + " 本\n";
+          warningMessage += tmp;
+        }); 
+        Modal.warning({
+          title: '库存不足',
+          content: warningMessage,
+        });
       } else {
-        // Something happened in setting up the request that triggered an Error
-        console.log('Error', error.message);
+        Axios.post("http://localhost:8080/orders/cart/buy", data, {
+          'Content-Type': 'application/json',
+        }).then((response) => {
+          if (response.data == 200) {
+            message.info("购买成功");
+            let oldData = [...this.state.dataSource];
+            // console.log(oldData);
+            // console.log(data);
+            for (let index = 0; index < oldData.length; index++) {
+              for (let j = 0; j < data.length; j++) {
+                if (oldData[index].key == data[j].bookId) {
+                  oldData.splice(index, 1);
+                }
+              }
+            }
+            this.setState({ dataSource: oldData, totalPrice: 0 });
+
+          }
+          console.log(response);
+        }).catch((error) => {
+          if (error.response) {
+            // The request was made and the server responded with a status code
+            // that falls out of the range of 2xx
+            console.log(error.response.data);
+            console.log(error.response.status);
+            console.log(error.response.headers);
+          } else if (error.request) {
+            // The request was made but no response was received
+            // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+            // http.ClientRequest in node.js
+            console.log(error.request);
+          } else {
+            // Something happened in setting up the request that triggered an Error
+            console.log('Error', error.message);
+          }
+          console.log(error.config);
+        })
       }
-      console.log(error.config);
-    })
+    });
+
+
   }
 
   render() {

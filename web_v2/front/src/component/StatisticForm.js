@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
 import {
-    Form, Icon, Input, Button, DatePicker
+    Form, Icon, Input, Button, DatePicker, message
 } from 'antd';
 import Axios from 'axios';
 
@@ -36,6 +36,7 @@ class StatisticForm extends Component {
                     // }
                     this.props.setDataSource(response.data);
                 }).catch((error) => {
+                    message.warn(error);
                     console.log(error);
                 })
             }

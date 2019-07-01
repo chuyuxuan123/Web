@@ -5,14 +5,17 @@ import com.alibaba.fastjson.JSONObject;
 import com.example.demo.dao.BookDao;
 import com.example.demo.dao.OrderDao;
 import com.example.demo.dao.OrderItemDao;
-import com.example.demo.dao.UserDao;
-import com.example.demo.model.*;
+import com.example.demo.model.Book;
+import com.example.demo.model.OrderItem;
+import com.example.demo.model.User;
+import com.example.demo.model.UserOrder;
 import com.example.demo.service.OrderService;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.google.common.collect.Lists;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -88,6 +91,103 @@ public class OrderServiceImpl implements OrderService {
 
 
         return 200;
+    }
+
+    @Override
+    public List<JSONObject> getBookSales() {
+        List<JSONObject> jsonObjects = new ArrayList<>();
+        int index = 0;
+        for (Object o : orderDao.getBookSales()
+        ) {
+            Object[] rowArray = (Object[]) o;
+            JSONObject object = new JSONObject();
+            object.put("key", index);
+            object.put("bookId", ((BigInteger) rowArray[0]).longValue());
+            object.put("bookName", (String) rowArray[1]);
+            object.put("sales", ((BigDecimal) rowArray[2]).intValue());
+            jsonObjects.add(object);
+            index++;
+        }
+        Collections.sort(jsonObjects, new Comparator<JSONObject>() {
+            @Override
+            public int compare(JSONObject o1, JSONObject o2) {
+                return o2.getInteger("sales") - o1.getInteger("sales");
+            }
+        });
+        return jsonObjects;
+
+    }
+
+    @Override
+    public List<JSONObject> getBookSalesBetween(Date start, Date end) {
+        List<JSONObject> jsonObjects = new ArrayList<>();
+        int index = 0;
+        for (Object o : orderDao.getBookSalesBetween(start, end)
+        ) {
+            Object[] rowArray = (Object[]) o;
+            JSONObject object = new JSONObject();
+            object.put("key", index);
+            object.put("bookId", ((BigInteger) rowArray[0]).longValue());
+            object.put("bookName", (String) rowArray[1]);
+            object.put("sales", ((BigDecimal) rowArray[2]).intValue());
+            jsonObjects.add(object);
+            index++;
+        }
+        Collections.sort(jsonObjects, new Comparator<JSONObject>() {
+            @Override
+            public int compare(JSONObject o1, JSONObject o2) {
+                return o2.getInteger("sales") - o1.getInteger("sales");
+            }
+        });
+        return jsonObjects;
+    }
+
+    @Override
+    public List<JSONObject> getUserPay() {
+        List<JSONObject> jsonObjects = new ArrayList<>();
+        int index = 0;
+        for (Object o : orderDao.getUserPay()
+        ) {
+            Object[] rowArray = (Object[]) o;
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("key", index);
+            jsonObject.put("user_id", rowArray[0]);
+            jsonObject.put("username", rowArray[1]);
+            jsonObject.put("pay", rowArray[2]);
+            jsonObjects.add(jsonObject);
+            index++;
+        }
+        Collections.sort(jsonObjects, new Comparator<JSONObject>() {
+            @Override
+            public int compare(JSONObject o1, JSONObject o2) {
+                return o2.getInteger("pay") - o1.getInteger("pay");
+            }
+        });
+        return jsonObjects;
+    }
+
+    @Override
+    public List<JSONObject> getUserPayBetween(Date start, Date end) {
+        List<JSONObject> jsonObjects = new ArrayList<>();
+        int index = 0;
+        for (Object o : orderDao.getUserPayBetween(start, end)
+        ) {
+            Object[] rowArray = (Object[]) o;
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("key", index);
+            jsonObject.put("user_id", rowArray[0]);
+            jsonObject.put("username", rowArray[1]);
+            jsonObject.put("pay", rowArray[2]);
+            jsonObjects.add(jsonObject);
+            index++;
+        }
+        Collections.sort(jsonObjects, new Comparator<JSONObject>() {
+            @Override
+            public int compare(JSONObject o1, JSONObject o2) {
+                return o2.getInteger("pay") - o1.getInteger("pay");
+            }
+        });
+        return jsonObjects;
     }
 
     private List<JSONObject> backToFront(List<UserOrder> userOrders) {

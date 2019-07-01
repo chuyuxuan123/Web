@@ -21,7 +21,7 @@ const Editor = ({ onChange, onSubmit, submitting, value }) => (
         </Form.Item>
         <Form.Item>
             <Button htmlType="submit" loading={submitting} onClick={onSubmit} type="primary">
-                Add Comment
+                上传评论
         </Button>
         </Form.Item>
     </div>
@@ -76,7 +76,13 @@ export default class BookComment extends Component {
         this.setState({
             submitting: true,
         });
-        Axios.post(`http://localhost:8080/books/${this.props.bookId}/comment`, this.state.value)
+        var tmp = {};
+        // x-www-form-urlencoded
+        tmp["comment"] = this.state.value;
+        Axios.post(`http://localhost:8080/books/${this.props.bookId}/comment`, tmp, {
+        headers: {
+            'Content-Type': 'application/json;charset=utf-8'
+          }})
             .then(Response => {
                 console.log(Response);
             });

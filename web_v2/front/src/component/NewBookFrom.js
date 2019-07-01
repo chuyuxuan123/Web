@@ -11,8 +11,8 @@ const NewBookCreateForm = Form.create({ name: 'form_in_modal' })(
     constructor(props) {
       super(props);
       this.state = {
+        fileList: [],
         loading:false,
-        file: '',
       }
     }
 
