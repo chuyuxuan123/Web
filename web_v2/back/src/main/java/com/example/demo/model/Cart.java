@@ -45,7 +45,7 @@ public class Cart {
 
     public void removeByBookId(Integer bookId) {
         for (int i = 0; i < cartItemList.size(); i++) {
-            if (cartItemList.get(i).getBookId() == bookId) {
+            if (cartItemList.get(i).getBookId().equals(bookId)) {
                 cartItemList.remove(i);
                 return;
             }
